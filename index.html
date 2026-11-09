@@ -306,10 +306,6 @@
             <input type="date" id="status-date-input" onchange="onStatusDateChange(this.value)">
           </div>
           <button class="btn btn-primary" onclick="openTaskModal(null)">เพิ่มงานใหม่</button>
-          <button class="btn btn-secondary" onclick="exportDataJSON()" title="สำรองข้อมูลเป็น JSON">ส่งออก</button>
-          <button class="btn btn-secondary" onclick="triggerImportJSON()" title="นำเข้าข้อมูลจาก JSON">นำเข้า</button>
-          <input type="file" id="json-file-input" style="display:none;" accept=".json" onchange="importDataJSON(event)">
-          <button class="btn btn-secondary" onclick="exportToCSV()" title="ส่งออกเป็น Excel / CSV">CSV</button>
           <button class="btn-icon" onclick="toggleTheme()" id="theme-toggle-btn" title="เปลี่ยนธีม สว่าง/มืด">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           </button>
@@ -571,6 +567,15 @@
             <option value="duration">คำนวณตามสัดส่วนระยะเวลาทำงาน (Duration Proportional)</option>
             <option value="manual">กำหนดเองอิสระในแต่ละรายการงาน (Manual Weight %)</option>
           </select>
+        </div>
+        <div style="margin-top:20px; padding:12px; background:var(--bg-subtle); border-radius:var(--radius-sm);">
+          <div style="font-weight:600; margin-bottom:10px;">📦 นำเข้า / ส่งออกข้อมูล:</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="exportDataJSON()" title="สำรองข้อมูลเป็น JSON">ส่งออก JSON</button>
+            <button class="btn btn-secondary btn-sm" onclick="triggerImportJSON()" title="นำเข้าข้อมูลจาก JSON">นำเข้า JSON</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportToCSV()" title="ส่งออกเป็น Excel / CSV">ส่งออก CSV</button>
+            <input type="file" id="json-file-input" style="display:none;" accept=".json" onchange="importDataJSON(event)">
+          </div>
         </div>
         <div style="margin-top:20px; padding:12px; background:var(--bg-subtle); border-radius:var(--radius-sm); font-size:0.82rem;">
           <div style="font-weight:600; margin-bottom:6px;">🛠️ จัดการข้อมูลโครงการ:</div>
