@@ -177,13 +177,23 @@
 
     /* Gantt Chart Container */
     .gantt-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 24px; }
+    .gantt-wrapper.gantt-expanded { position: fixed; inset: 12px; z-index: 500; display: flex; flex-direction: column; margin: 0; border-radius: var(--radius-lg); }
+    .gantt-expanded-open { overflow: hidden; }
     .gantt-toolbar { padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--bg-card); }
     .gantt-scroll-area { position: relative; overflow-x: auto; overflow-y: visible; max-height: 680px; }
+    .gantt-expanded .gantt-scroll-area { flex: 1; min-height: 0; max-height: none; overflow: auto; }
     .gantt-table { border-collapse: collapse; width: 100%; min-width: 900px; }
     .gantt-table th, .gantt-table td { border: 1px solid var(--border-color); padding: 6px 8px; font-size: 0.8rem; }
-    .gantt-task-col { width: 320px; min-width: 300px; position: sticky; left: 0; background: var(--bg-card); z-index: 20; box-shadow: 2px 0 5px rgba(0,0,0,0.04); }
-    .gantt-header-row { background: var(--bg-subtle); position: sticky; top: 0; z-index: 25; }
+    .gantt-task-col { width: 320px; min-width: 300px; position: sticky; left: 0; background: var(--bg-card); z-index: 100; box-shadow: 2px 0 5px rgba(0,0,0,0.04); }
+    .gantt-header-row { background: var(--bg-subtle); position: sticky; top: 0; z-index: 90; }
+    /* Frozen task header sits above every scrolling month/day header cell. */
+    .gantt-header-row .gantt-task-col { z-index: 1000 !important; background: var(--bg-card); }
+    .gantt-header-track { display: grid; grid-auto-columns: 28px; grid-auto-flow: column; width: max-content; min-width: 100%; }
+    .gantt-header-track > div { min-width: 28px; text-align: center; border-right: 1px solid var(--border-color); padding: 3px 0; }
+    .gantt-header-track.months > div { white-space: nowrap; padding: 4px 8px; }
     .gantt-timeline-cell { padding: 0 !important; position: relative; height: 38px; vertical-align: middle; }
+    .gantt-status-cell { position: relative; }
+    .gantt-status-line { position: absolute; z-index: 5; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #f87171, #dc2626); box-shadow: 0 0 0 1px rgba(255,255,255,.85), 0 0 7px rgba(220,38,38,.55); pointer-events: none; }
     .gantt-bar-container { position: relative; height: 24px; margin: 2px 0; }
     .gantt-planned-bar { position: absolute; top: 2px; height: 18px; background-color: #e0e7ff; border: 1px solid #a5b4fc; border-radius: 4px; z-index: 1; opacity: 0.85; }
     [data-theme="dark"] .gantt-planned-bar { background-color: #312e81; border-color: #4f46e5; }
@@ -401,6 +411,7 @@
           <div style="display:flex; align-items:center; gap:8px;">
             <select id="gantt-category-filter" class="filter-select" onchange="renderGantt()"><option value="ALL">ทุกหมวดหมู่งาน</option></select>
             <button class="btn btn-secondary btn-sm" onclick="scrollGanttToToday()">ไปที่วันประเมิน</button>
+            <button class="btn btn-secondary btn-sm" id="gantt-expand-btn" onclick="toggleGanttExpanded()" aria-pressed="false">⛶ ขยาย</button>
           </div>
         </div>
         <div class="gantt-scroll-area" id="gantt-scroll-container">
@@ -806,12 +817,17 @@
 
         if (d <= statusDate) {
           let actualSum = 0;
+          const isStatusPoint = formatDate(d) === formatDate(statusDate);
           state.tasks.forEach(t => {
             const as = parseDate(t.actualStart) || parseDate(t.plannedStart), ae = parseDate(t.actualEnd) || parseDate(t.plannedEnd);
             const prog = parseFloat(t.progress) || 0, w = parseFloat(t.weight) || 0;
             if (!as) return;
             let taskActual = 0;
-            if (prog > 0 && d >= as) {
+            // The entered progress is authoritative on the assessment date,
+            // even when a task's recorded start/end dates are inconsistent.
+            if (isStatusPoint) {
+              taskActual = prog;
+            } else if (prog > 0 && d >= as) {
               const targetEnd = (prog >= 100 && ae) ? ae : statusDate;
               if (d >= targetEnd) taskActual = prog;
               else taskActual = Math.min(prog, ((diffDays(as, d) + 1) / Math.max(1, diffDays(as, targetEnd) + 1)) * prog);
@@ -1038,14 +1054,27 @@
       
       const catSelect = document.getElementById("gantt-category-filter");
       catSelect.innerHTML = `<option value="ALL">ทุกหมวดหมู่งาน</option>` + [...new Set([...state.categories, ...state.tasks.map(t=>t.category)])].filter(Boolean).map(c => `<option value="${c}" ${c===catSelect.value?'selected':''}>${c}</option>`).join("");
+      const statusOffset = diffDays(tl.pStart, tl.statusDate);
+      const hasStatusMarker = statusOffset >= 0 && statusOffset < tl.dates.length;
+      const statusLine = hasStatusMarker ? `<span class="gantt-status-line" style="left:${statusOffset * 28 + 13}px;"></span>` : "";
 
-      let headM = `<th class="gantt-task-col" rowspan="2">รายการงาน (Task Name)</th>`, headD = "";
+      let headMonths = "", headD = "";
+      let monthStart = 0;
+      const monthLabel = d => new Intl.DateTimeFormat("th-TH", { month: "long", year: "numeric" }).format(d);
+      for (let i = 1; i <= tl.dates.length; i++) {
+        const currentMonth = i < tl.dates.length ? `${tl.dates[i].getFullYear()}-${tl.dates[i].getMonth()}` : null;
+        const startMonth = `${tl.dates[monthStart].getFullYear()}-${tl.dates[monthStart].getMonth()}`;
+        if (currentMonth !== startMonth) {
+          headMonths += `<div style="grid-column:span ${i - monthStart};">${monthLabel(tl.dates[monthStart])}</div>`;
+          monthStart = i;
+        }
+      }
       tl.dates.forEach(d => {
         const isStat = formatDate(d) === state.project.statusDate;
-        headD += `<th style="width:28px; min-width:28px; text-align:center; padding:3px 0; font-size:0.72rem; ${isStat?'background:#fee2e2;color:#ef4444;font-weight:700;':''}"><div>${d.getDate()}</div><div style="font-size:0.65rem; color:var(--text-muted);">${["อา","จ","อ","พ","พฤ","ศ","ส"][d.getDay()]}</div></th>`;
+        headD += `<div style="font-size:0.72rem; ${isStat?'background:#fee2e2;color:#ef4444;font-weight:700;':''}"><div>${d.getDate()}</div><div style="font-size:0.65rem; color:var(--text-muted);">${["อา","จ","อ","พ","พฤ","ศ","ส"][d.getDay()]}</div></div>`;
       });
-      headM += `<th colspan="${tl.dates.length}" style="text-align:center; background:var(--bg-subtle);">ไทม์ไลน์รายวัน (${formatThaiDate(tl.pStart)} - ${formatThaiDate(tl.pEnd)})</th>`;
-      thead.innerHTML = `<tr class="gantt-header-row">${headM}</tr><tr class="gantt-header-row">${headD}</tr>`;
+      const dayTrackStyle = `grid-template-columns:repeat(${tl.dates.length},28px);width:${tl.dates.length * 28}px;`;
+      thead.innerHTML = `<tr class="gantt-header-row"><th class="gantt-task-col">รายการงาน (Task Name)</th><th colspan="${tl.dates.length}" style="padding:0; background:var(--bg-subtle);"><div style="text-align:center; padding:6px 8px; border-bottom:1px solid var(--border-color);">ไทม์ไลน์รายวัน (${formatThaiDate(tl.pStart)} - ${formatThaiDate(tl.pEnd)})</div><div class="gantt-header-track months" style="${dayTrackStyle}">${headMonths}</div><div class="gantt-header-track" style="${dayTrackStyle}">${headD}</div></th></tr>`;
       
       if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="${tl.dates.length+1}" style="text-align:center; padding:40px; color:var(--text-muted);">ไม่มีข้อมูล</td></tr>`; return; }
 
@@ -1053,7 +1082,7 @@
       filtered.forEach(task => {
         if (task.category !== curCat) {
           curCat = task.category;
-          html += `<tr class="category-row"><td class="gantt-task-col">📁 ${curCat}</td><td colspan="${tl.dates.length}" style="background:var(--bg-subtle);"></td></tr>`;
+          html += `<tr class="category-row"><td class="gantt-task-col">📁 ${curCat}</td><td colspan="${tl.dates.length}" class="gantt-status-cell" style="background:var(--bg-subtle);">${statusLine}</td></tr>`;
         }
         const ps = parseDate(task.plannedStart) || tl.pStart, pe = parseDate(task.plannedEnd) || tl.pEnd;
         const bLeft = Math.max(0, diffDays(tl.pStart, ps)) * 28, bWidth = Math.max(1, diffDays(ps, pe) + 1) * 28;
@@ -1066,7 +1095,8 @@
               <span>${task.assignedTo || '-'}</span><span>${task.duration} วัน • <strong style="color:${prog===100?'var(--success)':'var(--primary)'};">${prog}%</strong></span>
             </div>
           </td>
-          <td colspan="${tl.dates.length}" class="gantt-timeline-cell">
+          <td colspan="${tl.dates.length}" class="gantt-timeline-cell gantt-status-cell">
+            ${statusLine}
             <div class="gantt-bar-container">
               <div class="gantt-planned-bar" style="left:${bLeft}px; width:${bWidth}px;"></div>
               ${prog > 0 ? `<div class="gantt-actual-bar" style="left:${bLeft}px; width:${aWidth}px;"></div>` : ''}
@@ -1077,6 +1107,16 @@
       tbody.innerHTML = html;
     }
     function scrollGanttToToday() { const cont = document.getElementById("gantt-scroll-container"), tl = calculateProjectTimeline(), off = diffDays(tl.pStart, tl.statusDate); if (cont && off > 0) cont.scrollTo({ left: off * 28 - 150, behavior: "smooth" }); }
+
+    function toggleGanttExpanded(force) {
+      const wrapper = document.querySelector("#tab-gantt .gantt-wrapper"), button = document.getElementById("gantt-expand-btn");
+      if (!wrapper || !button) return;
+      const expanded = typeof force === "boolean" ? force : !wrapper.classList.contains("gantt-expanded");
+      wrapper.classList.toggle("gantt-expanded", expanded);
+      document.body.classList.toggle("gantt-expanded-open", expanded);
+      button.setAttribute("aria-pressed", String(expanded));
+      button.innerHTML = expanded ? "⛶ ย่อกลับ" : "⛶ ขยาย";
+    }
 
     function getTaskStatusBadgeHtml(prog, plannedEndStr) {
       const pend = parseDate(plannedEndStr), statusD = parseDate(state.project.statusDate);
@@ -1489,6 +1529,7 @@
     /* INIT */
     function initApp() {
       loadState(); renderTasks(); renderDailyLogs(); setupCanvasHover(); renderCharts();
+      document.addEventListener("keydown", e => { if (e.key === "Escape") toggleGanttExpanded(false); });
       window.addEventListener("resize", () => { if (state.activeTab === "tab-scurve") drawSCurveCanvas(calculateProjectTimeline()); else if (state.activeTab === "tab-gantt") renderGantt(); else if (state.activeTab === "tab-manpower") drawManpowerCanvas(); });
     }
     window.addEventListener("DOMContentLoaded", initApp);
