@@ -346,6 +346,11 @@
         <div class="kpi-footer">ผลงานที่ส่งมอบและทำได้จริง</div>
       </div>
       <div class="kpi-card">
+        <div class="kpi-card-header"><span class="kpi-title">มูลค่างานสะสม (บาท)</span><div class="kpi-icon amber">💰</div></div>
+        <div class="kpi-value" id="kpi-actual-value">0.00 <span class="unit">บาท</span></div>
+        <div class="kpi-footer" id="kpi-actual-value-total">จากมูลค่างานทั้งหมด: -</div>
+      </div>
+      <div class="kpi-card">
         <div class="kpi-card-header"><span class="kpi-title">สถานะความก้าวหน้า (SV)</span><div class="kpi-icon amber">📉</div></div>
         <div class="kpi-value" id="kpi-variance-val">0.0 <span class="unit">%</span></div>
         <div class="kpi-footer"><span id="kpi-variance-badge" class="badge badge-success">ตรงตามแผนงาน</span><span id="kpi-days-variance" style="margin-left:auto; font-weight:600;">0 วัน</span></div>
@@ -465,6 +470,7 @@
                 <th style="width: 130px;">ทำจริง: เริ่ม - จบ</th>
                 <th style="width: 180px;">ความคืบหน้าจริง (% Actual)</th>
                 <th style="width: 70px; text-align:right;">น้ำหนัก</th>
+                <th style="width: 170px; text-align:right;">มูลค่างาน (บาท)</th>
                 <th style="width: 100px; text-align:center;">สถานะ</th>
                 <th class="task-actions-col" style="text-align:center; width:80px;">จัดการ</th>
               </tr>
@@ -525,6 +531,7 @@
           <div class="form-group"><label>ระยะเวลาตามแผน (วัน)</label><input type="number" id="modal-task-duration" class="form-control" readonly style="background:var(--bg-subtle);"></div>
           <div class="form-group"><label>น้ำหนักงาน (% Weight)</label><input type="number" id="modal-task-weight" class="form-control" step="0.1" min="0" placeholder="คำนวณอัตโนมัติหากเว้นว่าง"></div>
         </div>
+        <div class="form-group"><label>มูลค่างาน (บาท)</label><input type="number" id="modal-task-value" class="form-control" min="0" step="0.01" placeholder="เว้นว่างเพื่อแบ่งตามน้ำหนัก"></div>
         <hr style="border:0; border-top:1px solid var(--border-color); margin: 16px 0;">
         <div style="font-weight:600; font-size:0.9rem; margin-bottom:12px; color:var(--primary);">ผลการดำเนินงานจริง (Actual Performance)</div>
         <div class="form-row">
@@ -572,6 +579,7 @@
           <div class="form-group"><label>วันเริ่มต้นโครงการ</label><input type="date" id="cfg-project-start" class="form-control"></div>
           <div class="form-group"><label>วันสิ้นสุดโครงการ</label><input type="date" id="cfg-project-end" class="form-control"></div>
         </div>
+        <div class="form-group"><label>มูลค่าโครงการทั้งหมด (บาท)</label><input type="number" id="cfg-project-value" class="form-control" min="0" step="0.01" placeholder="ระบุมูลค่าโครงการเพื่อคำนวณมูลค่างานจริง"></div>
         <div class="form-group">
           <label>วิธีคำนวณค่าน้ำหนักงาน (Weight Mode)</label>
           <select id="cfg-weight-mode" class="form-control">
@@ -622,7 +630,7 @@
     /* =========================================================
        INITIAL DATA (PVCell Project)
        ========================================================= */
-    const DEFAULT_PROJECT = { name: "PVCell Project", lead: "STeP & TSUS", startDate: "2024-07-25", endDate: "2025-01-19", statusDate: "2024-11-09", weightMode: "duration" };
+    const DEFAULT_PROJECT = { name: "PVCell Project", lead: "STeP & TSUS", startDate: "2024-07-25", endDate: "2025-01-19", statusDate: "2024-11-09", weightMode: "duration", totalValue: 0 };
     const DEFAULT_TASKS = [
       { id: "T001", category: "Initial Project", name: "ขออนุมัติเอกสารของโครงการ", assignedTo: "Gokce Aslan", plannedStart: "2024-07-25", plannedEnd: "2024-07-30", duration: 6, actualStart: "2024-07-25", actualEnd: "2024-07-31", progress: 100, weight: 1.5, notes: "" },
       { id: "T002", category: "Initial Project", name: "รื้อถอนอุปกรณ์เดิม", assignedTo: "Hayden Cook", plannedStart: "2024-07-30", plannedEnd: "2024-08-06", duration: 8, actualStart: "2024-07-30", actualEnd: "2024-08-07", progress: 100, weight: 2.0, notes: "" },
@@ -652,6 +660,7 @@
           const parsed = JSON.parse(saved);
           if (parsed && parsed.project && Array.isArray(parsed.tasks)) {
             state.project = parsed.project;
+            state.project.totalValue = Math.max(0, parseFloat(state.project.totalValue) || 0);
             state.tasks = parsed.tasks;
             state.categories = Array.isArray(parsed.categories) ? parsed.categories : [];
             if (Array.isArray(parsed.dailyLogs)) state.dailyLogs = parsed.dailyLogs;
@@ -681,6 +690,30 @@
     }
     function diffDays(d1, d2) { if (!d1 || !d2) return 0; return Math.round((Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate()) - Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate())) / 86400000); }
     function addDays(d, n) { const res = new Date(d.getTime()); res.setDate(res.getDate() + n); return res; }
+    const bahtFormatter = new Intl.NumberFormat("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    function formatBaht(value) { return `${bahtFormatter.format(Math.max(0, Number(value) || 0))} บาท`; }
+    function getTaskValue(task) {
+      if (task.value !== null && task.value !== undefined && task.value !== "") return Math.max(0, Number(task.value) || 0);
+      const unpricedTasks = state.tasks.filter(item => item.value === null || item.value === undefined || item.value === "");
+      const manualValue = state.tasks.reduce((sum, item) => sum + (item.value !== null && item.value !== undefined && item.value !== "" ? Math.max(0, Number(item.value) || 0) : 0), 0);
+      const remainingValue = Math.max(0, (Number(state.project.totalValue) || 0) - manualValue);
+      const remainingWeight = unpricedTasks.reduce((sum, item) => sum + (Number(item.weight) || 0), 0);
+      return remainingWeight > 0 ? remainingValue * (Number(task.weight) || 0) / remainingWeight : 0;
+    }
+    function getProjectValueTotals() {
+      return state.tasks.reduce((totals, task) => {
+        const value = getTaskValue(task);
+        totals.budget += value;
+        totals.earned += value * Math.max(0, Math.min(100, Number(task.progress) || 0)) / 100;
+        return totals;
+      }, { budget: 0, earned: 0 });
+    }
+    function updateTaskValueCell(task, progress = task.progress) {
+      const cell = document.getElementById(`task-value-${task.id}`); if (!cell) return;
+      const total = getTaskValue(task), earned = total * (Math.max(0, Math.min(100, Number(progress) || 0)) / 100);
+      cell.innerHTML = total > 0 ? `<strong style="color:var(--success);">${formatBaht(earned)}</strong><div style="font-size:.72rem;color:var(--text-muted);">จาก ${formatBaht(total)}</div>` : `<span style="color:var(--text-muted);">กรอกมูลค่างาน</span>`;
+      cell.title = `มูลค่าที่ทำได้ ${formatBaht(earned)} จากมูลค่างาน ${formatBaht(total)}`;
+    }
 
     /* =========================================================
        DRAG & DROP FOR TASKS
@@ -1016,6 +1049,11 @@
       document.getElementById("kpi-time-pct").innerText = `${Math.min(100, (tl.elapsedDays / tl.totalDays) * 100).toFixed(1)}%`;
       document.getElementById("kpi-planned-pct").innerHTML = `${tl.plannedAtStatus.toFixed(1)} <span class="unit">%</span>`;
       document.getElementById("kpi-actual-pct").innerHTML = `${tl.actualAtStatus.toFixed(1)} <span class="unit">%</span>`;
+      const actualValueLabel = document.getElementById("kpi-actual-value");
+      const valueTotals = getProjectValueTotals();
+      if (actualValueLabel) actualValueLabel.innerHTML = `${bahtFormatter.format(valueTotals.earned)} <span class="unit">บาท</span>`;
+      const actualValueTotal = document.getElementById("kpi-actual-value-total");
+      if (actualValueTotal) actualValueTotal.textContent = valueTotals.budget > 0 ? `จากมูลค่างานทั้งหมด ${formatBaht(valueTotals.budget)}` : "กรอกมูลค่างานเพื่อแสดงยอดสะสม";
       
       const vVal = tl.variancePct, vBadge = document.getElementById("kpi-variance-badge"), vDays = document.getElementById("kpi-days-variance");
       document.getElementById("kpi-variance-val").innerHTML = `${vVal > 0 ? "+" : ""}${vVal.toFixed(1)} <span class="unit">%</span>`;
@@ -1144,9 +1182,9 @@
       catSelect.innerHTML = `<option value="ALL">ทุกหมวดหมู่งาน</option>` + [...new Set([...state.categories, ...state.tasks.map(t=>t.category)])].filter(Boolean).map(c => `<option value="${c}" ${c===catSelect.value?'selected':''}>${c}</option>`).join("");
 
       if (state.tasks.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:45px 20px;"><div style="font-size:2.2rem; margin-bottom:10px;">📋</div><div style="font-weight:600; font-size:1.1rem; margin-bottom:6px;">ยังไม่มีรายการงานในโครงการ</div></td></tr>`; updateBatchDelBtn(); return;
+        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:45px 20px;"><div style="font-size:2.2rem; margin-bottom:10px;">📋</div><div style="font-weight:600; font-size:1.1rem; margin-bottom:6px;">ยังไม่มีรายการงานในโครงการ</div></td></tr>`; updateBatchDelBtn(); return;
       }
-      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="13" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการงาน</td></tr>`; updateBatchDelBtn(); return; }
+      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการงาน</td></tr>`; updateBatchDelBtn(); return; }
 
       let html = "";
       list.forEach((t, i) => {
@@ -1205,6 +1243,7 @@
               </div>
             </td>
             <td style="text-align:right; font-weight:600;">${t.weight}%</td>
+            <td id="task-value-${t.id}" style="text-align:right; white-space:nowrap;">${getTaskValue(t) > 0 ? `<strong style="color:var(--success);">${formatBaht(getTaskValue(t) * prog / 100)}</strong><div style="font-size:.72rem;color:var(--text-muted);">จาก ${formatBaht(getTaskValue(t))}</div>` : `<span style="color:var(--text-muted);">กรอกมูลค่างาน</span>`}</td>
             <td id="stat-cell-${t.id}" style="text-align:center;">${getTaskStatusBadgeHtml(prog, t.plannedEnd)}</td>
             <td style="text-align:center;">
               <div style="display:flex; justify-content:center; gap:4px;">
@@ -1320,6 +1359,7 @@
       const badge = document.getElementById(`prog-bdg-${id}`), cell = document.getElementById(`stat-cell-${id}`), task = state.tasks.find(t=>t.id===id);
       if (badge) { badge.innerText = `${val}%`; badge.style.color = val == 100 ? "var(--success)" : "var(--primary)"; }
       if (cell && task) cell.innerHTML = getTaskStatusBadgeHtml(parseFloat(val), task.plannedEnd);
+      if (task) updateTaskValueCell(task, val);
     }
     function handleProgressChange(id, val) {
       const task = state.tasks.find(t=>t.id===id); if (!task) return;
@@ -1439,11 +1479,11 @@
       if (id) {
         const task = state.tasks.find(t => t.id === id); if (!task) return;
         title.innerHTML = `✏️ แก้ไขรายการงาน: ${task.name}`;
-        document.getElementById("modal-task-id").value = task.id; document.getElementById("modal-task-name").value = task.name; document.getElementById("modal-task-category").value = task.category; document.getElementById("modal-task-assigned").value = task.assignedTo || ""; document.getElementById("modal-task-pstart").value = task.plannedStart; document.getElementById("modal-task-pend").value = task.plannedEnd; document.getElementById("modal-task-duration").value = task.duration; document.getElementById("modal-task-weight").value = task.weight || ""; document.getElementById("modal-task-astart").value = task.actualStart || ""; document.getElementById("modal-task-aend").value = task.actualEnd || ""; document.getElementById("modal-task-progress").value = task.progress; document.getElementById("modal-task-progress-val").innerText = task.progress; document.getElementById("modal-task-notes").value = task.notes || "";
+        document.getElementById("modal-task-id").value = task.id; document.getElementById("modal-task-name").value = task.name; document.getElementById("modal-task-category").value = task.category; document.getElementById("modal-task-assigned").value = task.assignedTo || ""; document.getElementById("modal-task-pstart").value = task.plannedStart; document.getElementById("modal-task-pend").value = task.plannedEnd; document.getElementById("modal-task-duration").value = task.duration; document.getElementById("modal-task-weight").value = task.weight || ""; document.getElementById("modal-task-value").value = task.value ?? ""; document.getElementById("modal-task-astart").value = task.actualStart || ""; document.getElementById("modal-task-aend").value = task.actualEnd || ""; document.getElementById("modal-task-progress").value = task.progress; document.getElementById("modal-task-progress-val").innerText = task.progress; document.getElementById("modal-task-notes").value = task.notes || "";
         if (btnDel) btnDel.style.display = "inline-flex";
       } else {
         title.innerHTML = `➕ เพิ่มรายการงานใหม่`;
-        document.getElementById("modal-task-id").value = ""; document.getElementById("modal-task-name").value = ""; document.getElementById("modal-task-category").value = "General"; document.getElementById("modal-task-assigned").value = ""; document.getElementById("modal-task-pstart").value = state.project.statusDate || formatDate(new Date()); document.getElementById("modal-task-pend").value = formatDate(addDays(parseDate(state.project.statusDate) || new Date(), 7)); document.getElementById("modal-task-duration").value = "8"; document.getElementById("modal-task-weight").value = ""; document.getElementById("modal-task-astart").value = ""; document.getElementById("modal-task-aend").value = ""; document.getElementById("modal-task-progress").value = 0; document.getElementById("modal-task-progress-val").innerText = "0"; document.getElementById("modal-task-notes").value = "";
+        document.getElementById("modal-task-id").value = ""; document.getElementById("modal-task-name").value = ""; document.getElementById("modal-task-category").value = "General"; document.getElementById("modal-task-assigned").value = ""; document.getElementById("modal-task-pstart").value = state.project.statusDate || formatDate(new Date()); document.getElementById("modal-task-pend").value = formatDate(addDays(parseDate(state.project.statusDate) || new Date(), 7)); document.getElementById("modal-task-duration").value = "8"; document.getElementById("modal-task-weight").value = ""; document.getElementById("modal-task-value").value = ""; document.getElementById("modal-task-astart").value = ""; document.getElementById("modal-task-aend").value = ""; document.getElementById("modal-task-progress").value = 0; document.getElementById("modal-task-progress-val").innerText = "0"; document.getElementById("modal-task-notes").value = "";
         if (btnDel) btnDel.style.display = "none";
       }
       modal.classList.add("open");
@@ -1454,10 +1494,10 @@
       if (s && e) document.getElementById("modal-task-duration").value = Math.max(1, diffDays(s, e) + 1);
     }
     function saveTaskModal() {
-      const id = document.getElementById("modal-task-id").value, name = document.getElementById("modal-task-name").value.trim(), category = document.getElementById("modal-task-category").value.trim() || "General", assignedTo = document.getElementById("modal-task-assigned").value.trim(), plannedStart = document.getElementById("modal-task-pstart").value, plannedEnd = document.getElementById("modal-task-pend").value, duration = parseInt(document.getElementById("modal-task-duration").value) || 1, weight = parseFloat(document.getElementById("modal-task-weight").value) || 0, actualStart = document.getElementById("modal-task-astart").value, actualEnd = document.getElementById("modal-task-aend").value, progress = parseFloat(document.getElementById("modal-task-progress").value) || 0, notes = document.getElementById("modal-task-notes").value.trim();
+      const id = document.getElementById("modal-task-id").value, name = document.getElementById("modal-task-name").value.trim(), category = document.getElementById("modal-task-category").value.trim() || "General", assignedTo = document.getElementById("modal-task-assigned").value.trim(), plannedStart = document.getElementById("modal-task-pstart").value, plannedEnd = document.getElementById("modal-task-pend").value, duration = parseInt(document.getElementById("modal-task-duration").value) || 1, weight = parseFloat(document.getElementById("modal-task-weight").value) || 0, taskValueInput = document.getElementById("modal-task-value").value.trim(), value = taskValueInput === "" ? null : Math.max(0, parseFloat(taskValueInput) || 0), actualStart = document.getElementById("modal-task-astart").value, actualEnd = document.getElementById("modal-task-aend").value, progress = parseFloat(document.getElementById("modal-task-progress").value) || 0, notes = document.getElementById("modal-task-notes").value.trim();
       if (!name || !category || !plannedStart || !plannedEnd) { alert("กรุณากรอกชื่องาน หมวดหมู่ และวันที่ตามแผนให้ครบถ้วน"); return; }
-      if (id) { const t = state.tasks.find(t=>t.id===id); if(t) Object.assign(t, {name,category,assignedTo,plannedStart,plannedEnd,duration,weight,actualStart,actualEnd,progress,notes}); }
-      else { state.tasks.push({id:"T"+Date.now(), name,category,assignedTo,plannedStart,plannedEnd,duration,weight,actualStart,actualEnd,progress,notes}); }
+      if (id) { const t = state.tasks.find(t=>t.id===id); if(t) Object.assign(t, {name,category,assignedTo,plannedStart,plannedEnd,duration,weight,value,actualStart,actualEnd,progress,notes}); }
+      else { state.tasks.push({id:"T"+Date.now(), name,category,assignedTo,plannedStart,plannedEnd,duration,weight,value,actualStart,actualEnd,progress,notes}); }
       if (!state.categories.includes(category)) state.categories.push(category);
       normalizeWeights(); saveState(); closeTaskModal(); renderTasks();
       const tl = calculateProjectTimeline(); updateKPICards(tl);
@@ -1465,10 +1505,10 @@
       showToast("บันทึกรายการสำเร็จ");
     }
 
-    function openProjectSettingsModal() { document.getElementById("cfg-project-name").value=state.project.name; document.getElementById("cfg-project-lead").value=state.project.lead; document.getElementById("cfg-project-start").value=state.project.startDate; document.getElementById("cfg-project-end").value=state.project.endDate; document.getElementById("cfg-weight-mode").value=state.project.weightMode; document.getElementById("project-modal").classList.add("open"); }
+    function openProjectSettingsModal() { document.getElementById("cfg-project-name").value=state.project.name; document.getElementById("cfg-project-lead").value=state.project.lead; document.getElementById("cfg-project-start").value=state.project.startDate; document.getElementById("cfg-project-end").value=state.project.endDate; document.getElementById("cfg-project-value").value=state.project.totalValue || ""; document.getElementById("cfg-weight-mode").value=state.project.weightMode; document.getElementById("project-modal").classList.add("open"); }
     function closeProjectSettingsModal() { document.getElementById("project-modal").classList.remove("open"); }
     function saveProjectSettingsModal() {
-      state.project.name = document.getElementById("cfg-project-name").value.trim() || "My Project"; state.project.lead = document.getElementById("cfg-project-lead").value.trim() || "-"; state.project.startDate = document.getElementById("cfg-project-start").value; state.project.endDate = document.getElementById("cfg-project-end").value; state.project.weightMode = document.getElementById("cfg-weight-mode").value;
+      state.project.name = document.getElementById("cfg-project-name").value.trim() || "My Project"; state.project.lead = document.getElementById("cfg-project-lead").value.trim() || "-"; state.project.startDate = document.getElementById("cfg-project-start").value; state.project.endDate = document.getElementById("cfg-project-end").value; state.project.totalValue = Math.max(0, parseFloat(document.getElementById("cfg-project-value").value) || 0); state.project.weightMode = document.getElementById("cfg-weight-mode").value;
       saveState(); closeProjectSettingsModal(); renderTasks();
       const tl = calculateProjectTimeline(); updateKPICards(tl);
       if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
@@ -1519,8 +1559,8 @@
       }; r.readAsText(f); e.target.value = "";
     }
     function exportToCSV() {
-      let csv = "\uFEFFID,หมวดหมู่,ชื่องาน,ผู้รับผิดชอบ,วันที่เริ่มตามแผน,วันที่สิ้นสุดตามแผน,ระยะเวลา(วัน),วันที่เริ่มจริง,วันที่สิ้นสุดจริง,ความคืบหน้า(%),น้ำหนัก(%)\n";
-      state.tasks.forEach(t => csv += `"${t.id}","${t.category}","${t.name}","${t.assignedTo||''}","${t.plannedStart}","${t.plannedEnd}",${t.duration},"${t.actualStart||''}","${t.actualEnd||''}",${t.progress},${t.weight}\n`);
+      let csv = "\uFEFFID,หมวดหมู่,ชื่องาน,ผู้รับผิดชอบ,วันที่เริ่มตามแผน,วันที่สิ้นสุดตามแผน,ระยะเวลา(วัน),วันที่เริ่มจริง,วันที่สิ้นสุดจริง,ความคืบหน้า(%),น้ำหนัก(%),มูลค่างาน(บาท)\n";
+      state.tasks.forEach(t => csv += `"${t.id}","${t.category}","${t.name}","${t.assignedTo||''}","${t.plannedStart}","${t.plannedEnd}",${t.duration},"${t.actualStart||''}","${t.actualEnd||''}",${t.progress},${t.weight},"${t.value ?? ''}"\n`);
       const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8;"})); a.download = `Tasks.csv`; document.body.appendChild(a); a.click(); a.remove(); showToast("ส่งออก CSV สำเร็จ");
     }
     function downloadChartImage() { const c = document.getElementById("scurve-canvas"); if(c){ const a = document.createElement("a"); a.download="SCurve.png"; a.href=c.toDataURL("image/png"); a.click(); showToast("บันทึกกราฟเรียบร้อย"); } }
