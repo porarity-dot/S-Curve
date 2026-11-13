@@ -1120,7 +1120,8 @@
       filtered.forEach(task => {
         if (task.category !== curCat) {
           curCat = task.category;
-          html += `<tr class="category-row"><td class="gantt-task-col">📁 ${curCat}</td><td colspan="${tl.dates.length}" class="gantt-status-cell" style="background:var(--bg-subtle);">${statusLine}</td></tr>`;
+          const categoryValue = state.tasks.filter(item => item.category === curCat).reduce((sum, item) => sum + getTaskValue(item), 0);
+          html += `<tr class="category-row"><td class="gantt-task-col"><div style="display:flex; align-items:center; justify-content:space-between; gap:8px;"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📁 ${curCat}</span><span class="badge badge-info" style="white-space:nowrap; flex-shrink:0;">${formatBaht(categoryValue)}</span></div></td><td colspan="${tl.dates.length}" class="gantt-status-cell" style="background:var(--bg-subtle);">${statusLine}</td></tr>`;
         }
         const ps = parseDate(task.plannedStart) || tl.pStart, pe = parseDate(task.plannedEnd) || tl.pEnd;
         const bLeft = Math.max(0, diffDays(tl.pStart, ps)) * 28, bWidth = Math.max(1, diffDays(ps, pe) + 1) * 28;
