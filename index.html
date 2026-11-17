@@ -457,8 +457,6 @@
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm task-selection-action" id="btn-select-all-tasks" onclick="selectAllTasks()" style="display:none;" title="เลือกงานทั้งหมด">เลือกทั้งหมด</button>
             <button class="btn btn-danger btn-sm" id="btn-batch-delete" onclick="deleteSelectedTasks()" style="display:none;" title="ลบรายการงานที่เลือก">ลบที่เลือก (<span id="batch-delete-count">0</span>)</button>
-            <button class="btn btn-outline-danger btn-sm" id="btn-clear-all-tasks" onclick="clearAllTasks()" title="ลบรายการงานทั้งหมดในตารางเพื่อเริ่มงานใหม่">ลบงานทั้งหมด</button>
-            <button class="btn btn-secondary btn-sm" id="btn-auto-calculate-weights" onclick="autoCalculateWeights()" style="display:none;" title="เติมค่าน้ำหนักตามสัดส่วนระยะเวลา (ยังคงโหมดกำหนดเอง แก้ต่อได้)">⚖️ คำนวณน้ำหนักอัตโนมัติ</button>
             <button class="btn btn-secondary btn-sm" onclick="openCategoryManager()">☷ หมวดหมู่ทั้งหมด</button>
             <button class="btn btn-primary btn-sm" onclick="openTaskModal(null)">เพิ่มงานใหม่</button>
           </div>
@@ -1562,14 +1560,11 @@
       const hasSelection = selectedCount > 0;
       const selectAllButton = document.getElementById("btn-select-all-tasks");
       const deleteSelectedButton = document.getElementById("btn-batch-delete");
-      const autoWeightsButton = document.getElementById("btn-auto-calculate-weights");
       const selectAllCheckbox = document.getElementById("th-select-all");
       document.getElementById("batch-delete-count").textContent = selectedCount;
       selectAllButton.style.display = hasSelection ? "inline-flex" : "none";
       selectAllButton.textContent = totalCount > 0 && selectedCount === totalCount ? "ยกเลิกเลือกทั้งหมด" : "เลือกทั้งหมด";
       deleteSelectedButton.style.display = hasSelection ? "inline-flex" : "none";
-      // only meaningful in manual mode — duration mode recalculates on every save
-      autoWeightsButton.style.display = state.project.weightMode === "manual" && state.tasks.length ? "inline-flex" : "none";
       selectAllCheckbox.checked = totalCount > 0 && selectedCount === totalCount;
       selectAllCheckbox.indeterminate = hasSelection && selectedCount < totalCount;
     }
