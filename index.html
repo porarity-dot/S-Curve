@@ -507,12 +507,16 @@
       <div class="task-table-wrapper">
         <div class="task-table-toolbar">
           <h3 style="font-size:1.05rem; font-weight:600;">บันทึกรายงานหน้างานประจำวัน (Site Daily Logs)</h3>
-          <span class="badge badge-info" id="manpower-log-count">0 รายการ</span>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" id="btn-select-all-logs" onclick="selectAllLogs()" style="display:none;">เลือกทั้งหมด</button>
+            <button class="btn btn-danger btn-sm" id="btn-delete-logs" onclick="deleteSelectedLogs()" style="display:none;">ลบที่เลือก (<span id="log-delete-count">0</span>)</button>
+            <span class="badge badge-info" id="manpower-log-count">0 รายการ</span>
+          </div>
         </div>
         <div class="task-table-responsive">
           <table class="task-table" style="table-layout: auto;">
             <thead>
-              <tr><th style="width: 120px;">วันที่</th><th style="width: 140px; text-align:center;">จำนวนคนงาน (คน)</th><th>กิจกรรม / รายการงานที่ทำจริงประจำวัน</th><th>อุปสรรค / ปัญหา / สภาพอากาศ</th><th style="text-align:center; width:90px;">จัดการ</th></tr>
+              <tr><th style="width: 44px; text-align:center;"><input type="checkbox" id="th-select-all-logs" onchange="toggleSelectAllLogs(this.checked)" title="เลือกทั้งหมด"></th><th style="width: 120px;">วันที่</th><th style="width: 140px; text-align:center;">จำนวนคนงาน (คน)</th><th>กิจกรรม / รายการงานที่ทำจริงประจำวัน</th><th>อุปสรรค / ปัญหา / สภาพอากาศ</th><th style="text-align:center; width:90px;">จัดการ</th></tr>
             </thead>
             <tbody id="manpower-tbody"></tbody>
           </table>
@@ -1575,8 +1579,8 @@
     function renderDailyLogs() {
       const tbody = document.getElementById("manpower-tbody"); if (!tbody) return;
       const logs = [...state.dailyLogs].sort((a, b) => (a.date < b.date ? 1 : -1));
-      if (logs.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่มีรายการบันทึก</td></tr>`; return; }
-      tbody.innerHTML = logs.map(l => `<tr><td><strong>${formatThaiDate(l.date)}</strong></td><td style="text-align:center;"><span class="badge badge-info">${l.workers} คน</span></td><td style="white-space:pre-wrap;">${escapeHtml(l.activity || "-")}</td><td style="color:var(--text-muted);">${escapeHtml(l.notes || "-")}</td><td style="text-align:center;"><div style="display:flex; justify-content:center; gap:4px;"><button class="btn-icon btn-sm" onclick="openAddDailyLogModal(${jsArg(l.id)})" title="แก้ไข">✏️</button><button class="btn-icon btn-sm" onclick="deleteDailyLog(${jsArg(l.id)})" title="ลบ" style="color:var(--danger);">🗑️</button></div></td></tr>`).join("");
+      if (logs.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่มีรายการบันทึก</td></tr>`; updateLogSelection(); return; }
+      tbody.innerHTML = logs.map(l => `<tr class="log-row"><td style="text-align:center;"><input type="checkbox" class="log-checkbox" value="${escapeHtml(l.id)}" onchange="updateLogSelection()"></td><td><strong>${formatThaiDate(l.date)}</strong></td><td style="text-align:center;"><span class="badge badge-info">${l.workers} คน</span></td><td style="white-space:pre-wrap;">${escapeHtml(l.activity || "-")}</td><td style="color:var(--text-muted);">${escapeHtml(l.notes || "-")}</td><td style="text-align:center;"><div style="display:flex; justify-content:center; gap:4px;"><button class="btn-icon btn-sm" onclick="openAddDailyLogModal(${jsArg(l.id)})" title="แก้ไข">✏️</button><button class="btn-icon btn-sm" onclick="deleteDailyLog(${jsArg(l.id)})" title="ลบ" style="color:var(--danger);">🗑️</button></div></td></tr>`).join(""); updateLogSelection();
     }
     function openAddDailyLogModal(id) {
       const log = id ? state.dailyLogs.find(l => l.id === id) : null;
@@ -1602,6 +1606,28 @@
       if (id) { const l = state.dailyLogs.find(x => x.id === id); if (l) Object.assign(l, { date, workers, activity, notes }); }
       else state.dailyLogs.push({ id: "L" + Date.now(), date, workers, activity, notes });
       saveState(); closeDailyLogModal(); renderDailyLogs(); drawManpowerCanvas(); updateKPICards(); showToast("บันทึกคนงานสำเร็จ");
+    }
+    function updateLogSelection() {
+      const boxes = Array.from(document.querySelectorAll(".log-checkbox")), selected = boxes.filter(b => b.checked).length;
+      const has = selected > 0, all = boxes.length > 0 && selected === boxes.length;
+      document.getElementById("log-delete-count").textContent = selected;
+      document.getElementById("btn-delete-logs").style.display = has ? "inline-flex" : "none";
+      const sa = document.getElementById("btn-select-all-logs");
+      sa.style.display = has ? "inline-flex" : "none"; sa.textContent = all ? "ยกเลิกเลือกทั้งหมด" : "เลือกทั้งหมด";
+      const head = document.getElementById("th-select-all-logs");
+      head.checked = all; head.indeterminate = has && !all;
+      boxes.forEach(b => b.closest("tr").style.background = b.checked ? "var(--primary-subtle)" : "");
+    }
+    function toggleSelectAllLogs(checked) { document.querySelectorAll(".log-checkbox").forEach(b => b.checked = checked); updateLogSelection(); }
+    function selectAllLogs() {
+      const boxes = Array.from(document.querySelectorAll(".log-checkbox"));
+      toggleSelectAllLogs(!(boxes.length && boxes.every(b => b.checked)));
+    }
+    function deleteSelectedLogs() {
+      const ids = Array.from(document.querySelectorAll(".log-checkbox:checked")).map(b => b.value);
+      if (!ids.length || !confirm(`ต้องการลบบันทึกหน้างานที่เลือก ${ids.length} รายการ?`)) return;
+      state.dailyLogs = state.dailyLogs.filter(l => !ids.includes(l.id));
+      saveState(); renderDailyLogs(); drawManpowerCanvas(); updateKPICards(); showToast(`ลบบันทึก ${ids.length} รายการสำเร็จ`);
     }
     function deleteDailyLog(id) { if (confirm("ลบบันทึกนี้?")) { state.dailyLogs = state.dailyLogs.filter(l => l.id !== id); saveState(); renderDailyLogs(); drawManpowerCanvas(); updateKPICards(); showToast("ลบสำเร็จ"); } }
 
