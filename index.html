@@ -1925,6 +1925,9 @@
       let theme = "light"; try { theme = localStorage.getItem(THEME_KEY) || "light"; } catch (e) { /* ignore */ }
       document.body.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
       loadState();
+      // Every time the page is opened, the assessment (status) date starts at today.
+      state.project.statusDate = formatDate(today());
+      saveState();
       setupGlobalListeners();
       refreshAll();
     }
