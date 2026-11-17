@@ -133,6 +133,10 @@
     .badge-danger { background: var(--danger-subtle); color: #991b1b; }
     .badge-info { background: var(--primary-subtle); color: #1e40af; }
     .badge-neutral { background: var(--bg-subtle); color: var(--text-muted); }
+    [data-theme="dark"] .badge-info { color: #bfdbfe; }
+    [data-theme="dark"] .badge-success { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+    [data-theme="dark"] .badge-danger { background: rgba(239,68,68,0.2); color: #fca5a5; }
+    [data-theme="dark"] .badge-warning { background: rgba(245,158,11,0.2); color: #fcd34d; }
 
     /* Navigation Tabs */
     .tab-bar { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; }
@@ -176,18 +180,20 @@
     .perf-box-desc { font-size: 0.88rem; color: var(--text-main); }
 
     /* Gantt Chart Container */
-    .gantt-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 24px; }
+    .gantt-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 24px; isolation: isolate; /* keeps sticky z-indexes inside the card, never above the page header */ }
     .gantt-wrapper.gantt-expanded { position: fixed; inset: 12px; z-index: 500; display: flex; flex-direction: column; margin: 0; border-radius: var(--radius-lg); }
     .gantt-expanded-open { overflow: hidden; }
     .gantt-toolbar { padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--bg-card); }
-    .gantt-scroll-area { position: relative; overflow-x: auto; overflow-y: visible; max-height: 680px; }
+    .gantt-scroll-area { position: relative; overflow: auto; max-height: calc(100vh - 170px); min-height: 240px; }
     .gantt-expanded .gantt-scroll-area { flex: 1; min-height: 0; max-height: none; overflow: auto; }
-    .gantt-table { border-collapse: collapse; width: 100%; min-width: 900px; }
-    .gantt-table th, .gantt-table td { border: 1px solid var(--border-color); padding: 6px 8px; font-size: 0.8rem; }
-    .gantt-task-col { width: 320px; min-width: 300px; position: sticky; left: 0; background: var(--bg-card); z-index: 100; box-shadow: 2px 0 5px rgba(0,0,0,0.04); }
-    .gantt-header-row { background: var(--bg-subtle); position: sticky; top: 0; z-index: 90; }
+    /* separate borders: collapsed borders disappear from sticky cells while scrolling */
+    .gantt-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 900px; }
+    .gantt-table th, .gantt-table td { border: 0; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 6px 8px; font-size: 0.8rem; }
+    .gantt-task-col { width: 320px; min-width: 300px; max-width: 320px; position: sticky; left: 0; background: var(--bg-card); z-index: 20; box-shadow: 2px 0 5px rgba(0,0,0,0.06); }
+    /* sticky must be on the th cells (sticky on <tr> is unreliable) */
+    .gantt-header-row th { position: sticky; top: 0; z-index: 30; background: var(--bg-subtle); box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
     /* Frozen task header sits above every scrolling month/day header cell. */
-    .gantt-header-row .gantt-task-col { z-index: 1000 !important; background: var(--bg-card); }
+    .gantt-header-row th.gantt-task-col { left: 0; z-index: 40; background: var(--bg-card); }
     .gantt-header-track { display: grid; grid-auto-columns: 28px; grid-auto-flow: column; width: max-content; min-width: 100%; }
     .gantt-header-track > div { min-width: 28px; text-align: center; border-right: 1px solid var(--border-color); padding: 3px 0; }
     .gantt-header-track.months > div { white-space: nowrap; padding: 4px 8px; }
@@ -206,23 +212,24 @@
     .search-input { padding: 8px 12px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-main); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.85rem; min-width: 220px; outline: none; }
     .search-input:focus { border-color: var(--primary); }
     .filter-select { padding: 8px 12px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-main); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer; }
-    
+
     .task-table-responsive { overflow-x: auto; max-height: 720px; position: relative; }
     .task-table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
     .task-table th { background: var(--bg-subtle); color: var(--text-muted); font-weight: 600; font-size: 0.8rem; padding: 12px 12px; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .task-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
     .task-table tr:hover { background-color: var(--bg-subtle); }
     .category-row { background-color: var(--bg-subtle) !important; font-weight: 600; color: var(--primary); }
-    
-    .progress-slider-cell { display: flex; align-items: center; gap: 8px; min-width: 140px; }
-    .progress-slider { flex: 1; height: 6px; -webkit-appearance: none; appearance: none; background: var(--border-color); border-radius: 3px; outline: none; cursor: pointer; }
+
+    .progress-slider-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .progress-slider { flex: 1; min-width: 0; width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: var(--border-color); border-radius: 3px; outline: none; cursor: pointer; }
     .progress-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-    .progress-pct-badge { font-weight: 600; font-size: 0.8rem; min-width: 44px; text-align: right; }
+    .progress-pct-badge { font-weight: 600; font-size: 0.8rem; min-width: 40px; flex-shrink: 0; text-align: right; }
 
     /* =========================================
        Column Resizer CSS
        ========================================= */
-    .task-table th { position: relative; }
+    /* th is already position:sticky (a positioned element), so the resizer anchors to it
+       without overriding sticky — the old `position: relative` here broke the frozen header. */
     .task-table th .resizer {
       position: absolute;
       top: 0;
@@ -246,10 +253,10 @@
     tr.task-row-item { transition: background 0.15s ease, opacity 0.15s ease; }
     tr.task-row-item.dragging { opacity: 0.4; background: var(--bg-subtle) !important; }
     tr.task-row-item.drag-over { border-top: 3px solid var(--primary) !important; background: rgba(37, 99, 235, 0.06) !important; }
-    
-    .drag-handle { 
-      font-size: 1.15rem; letter-spacing: -2px; color: var(--text-muted); 
-      cursor: grab; padding: 6px 4px !important; text-align: center; user-select: none; 
+
+    .drag-handle {
+      font-size: 1.15rem; letter-spacing: -2px; color: var(--text-muted);
+      cursor: grab; padding: 6px 4px !important; text-align: center; user-select: none;
     }
     .drag-handle:active { cursor: grabbing; color: var(--primary); }
 
@@ -267,6 +274,9 @@
     .form-control { width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-body); color: var(--text-main); font-family: inherit; font-size: 0.88rem; outline: none; }
     .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-subtle); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-control:disabled { background: var(--bg-subtle); color: var(--text-muted); cursor: not-allowed; }
+    .form-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+    .legend-item.off { opacity: 0.35; text-decoration: line-through; }
 
     /* Toast Notification */
     .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #ffffff; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); z-index: 300; }
@@ -314,6 +324,7 @@
           <div class="status-date-badge" title="กำหนดวันประเมินผลความคืบหน้า (As-of Date)">
             <label for="status-date-input">วันประเมินผล:</label>
             <input type="date" id="status-date-input" onchange="onStatusDateChange(this.value)">
+            <button class="btn btn-secondary btn-sm" onclick="onStatusDateChange(formatDate(today()))" title="ตั้งวันประเมินผลเป็นวันนี้">วันนี้</button>
           </div>
           <button class="btn btn-primary" onclick="openTaskModal(null)">เพิ่มงานใหม่</button>
           <button class="btn-icon" onclick="toggleTheme()" id="theme-toggle-btn" title="เปลี่ยนธีม สว่าง/มืด">
@@ -446,8 +457,8 @@
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm task-selection-action" id="btn-select-all-tasks" onclick="selectAllTasks()" style="display:none;" title="เลือกงานทั้งหมด">เลือกทั้งหมด</button>
             <button class="btn btn-danger btn-sm" id="btn-batch-delete" onclick="deleteSelectedTasks()" style="display:none;" title="ลบรายการงานที่เลือก">ลบที่เลือก (<span id="batch-delete-count">0</span>)</button>
-            <button class="btn btn-outline-danger btn-sm task-selection-action" id="btn-clear-all-tasks" onclick="clearAllTasks()" style="display:none;" title="ลบรายการงานทั้งหมดในตารางเพื่อเริ่มงานใหม่">ลบงานทั้งหมด</button>
-            <button class="btn btn-secondary btn-sm task-selection-action" id="btn-auto-calculate-weights" onclick="autoCalculateWeights()" style="display:none;" title="คำนวณสัดส่วนน้ำหนักงานอัตโนมัติตามระยะเวลา (Duration)">⚖️ คำนวณน้ำหนักอัตโนมัติ</button>
+            <button class="btn btn-outline-danger btn-sm" id="btn-clear-all-tasks" onclick="clearAllTasks()" title="ลบรายการงานทั้งหมดในตารางเพื่อเริ่มงานใหม่">ลบงานทั้งหมด</button>
+            <button class="btn btn-secondary btn-sm" id="btn-auto-calculate-weights" onclick="autoCalculateWeights()" style="display:none;" title="เติมค่าน้ำหนักตามสัดส่วนระยะเวลา (ยังคงโหมดกำหนดเอง แก้ต่อได้)">⚖️ คำนวณน้ำหนักอัตโนมัติ</button>
             <button class="btn btn-secondary btn-sm" onclick="openCategoryManager()">☷ หมวดหมู่ทั้งหมด</button>
             <button class="btn btn-primary btn-sm" onclick="openTaskModal(null)">เพิ่มงานใหม่</button>
           </div>
@@ -469,7 +480,7 @@
                 <th style="width: 75px; text-align:center;">ระยะเวลา</th>
                 <th style="width: 130px;">ทำจริง: เริ่ม - จบ</th>
                 <th style="width: 180px;">ความคืบหน้าจริง (% Actual)</th>
-                <th style="width: 70px; text-align:right;">น้ำหนัก</th>
+                <th style="width: 85px; text-align:right;">น้ำหนัก</th>
                 <th style="width: 170px; text-align:right;">มูลค่างาน (บาท)</th>
                 <th style="width: 100px; text-align:center;">สถานะ</th>
                 <th class="task-actions-col" style="text-align:center; width:80px;">จัดการ</th>
@@ -529,7 +540,7 @@
         </div>
         <div class="form-row">
           <div class="form-group"><label>ระยะเวลาตามแผน (วัน)</label><input type="number" id="modal-task-duration" class="form-control" readonly style="background:var(--bg-subtle);"></div>
-          <div class="form-group"><label>น้ำหนักงาน (% Weight)</label><input type="number" id="modal-task-weight" class="form-control" step="0.1" min="0" placeholder="คำนวณอัตโนมัติหากเว้นว่าง"></div>
+          <div class="form-group"><label>น้ำหนักงาน (% Weight)</label><input type="number" id="modal-task-weight" class="form-control" step="0.1" min="0" placeholder="คำนวณอัตโนมัติหากเว้นว่าง"><div class="form-hint" id="modal-task-weight-hint"></div></div>
         </div>
         <div class="form-group"><label>มูลค่างาน (บาท)</label><input type="number" id="modal-task-value" class="form-control" min="0" step="0.01" placeholder="เว้นว่างเพื่อแบ่งตามน้ำหนัก"></div>
         <hr style="border:0; border-top:1px solid var(--border-color); margin: 16px 0;">
@@ -592,8 +603,10 @@
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" onclick="exportDataJSON()" title="สำรองข้อมูลเป็น JSON">ส่งออก JSON</button>
             <button class="btn btn-secondary btn-sm" onclick="triggerImportJSON()" title="นำเข้าข้อมูลจาก JSON">นำเข้า JSON</button>
+            <button class="btn btn-secondary btn-sm" onclick="triggerImportCSV()" title="นำเข้ารายการงานจาก CSV">นำเข้า CSV</button>
             <button class="btn btn-secondary btn-sm" onclick="exportToCSV()" title="ส่งออกเป็น Excel / CSV">ส่งออก CSV</button>
             <input type="file" id="json-file-input" style="display:none;" accept=".json" onchange="importDataJSON(event)">
+            <input type="file" id="csv-file-input" style="display:none;" accept=".csv,text/csv" onchange="importTasksCSV(event)">
           </div>
         </div>
         <div style="margin-top:20px; padding:12px; background:var(--bg-subtle); border-radius:var(--radius-sm); font-size:0.82rem;">
@@ -608,7 +621,7 @@
   <!-- MODAL: ADD DAILY LOG -->
   <div class="modal-overlay" id="daily-log-modal">
     <div class="modal-card">
-      <div class="modal-header"><h3>บันทึกคนงาน & รายงานหน้างาน</h3><button class="btn-icon btn-sm" onclick="closeDailyLogModal()">✕</button></div>
+      <div class="modal-header"><h3 id="daily-log-modal-title">บันทึกคนงาน & รายงานหน้างาน</h3><button class="btn-icon btn-sm" onclick="closeDailyLogModal()">✕</button></div>
       <div class="modal-body">
         <input type="hidden" id="modal-log-id">
         <div class="form-row">
@@ -632,10 +645,10 @@
        ========================================================= */
     const DEFAULT_PROJECT = { name: "PVCell Project", lead: "STeP & TSUS", startDate: "2024-07-25", endDate: "2025-01-19", statusDate: "2024-11-09", weightMode: "duration", totalValue: 0 };
     const DEFAULT_TASKS = [
-      { id: "T001", category: "Initial Project", name: "ขออนุมัติเอกสารของโครงการ", assignedTo: "Gokce Aslan", plannedStart: "2024-07-25", plannedEnd: "2024-07-30", duration: 6, actualStart: "2024-07-25", actualEnd: "2024-07-31", progress: 100, weight: 1.5, notes: "" },
-      { id: "T002", category: "Initial Project", name: "รื้อถอนอุปกรณ์เดิม", assignedTo: "Hayden Cook", plannedStart: "2024-07-30", plannedEnd: "2024-08-06", duration: 8, actualStart: "2024-07-30", actualEnd: "2024-08-07", progress: 100, weight: 2.0, notes: "" },
-      { id: "T036", category: "Installation Solar Panel", name: "ติดตั้งระบบไฟฟ้าฝั่ง AC - อาคาร C", assignedTo: "Hayden Cook", plannedStart: "2024-11-09", plannedEnd: "2024-11-14", duration: 6, actualStart: "2024-11-09", actualEnd: "", progress: 60, weight: 1.8, notes: "กำลังเดินสายไฟ" },
-      { id: "T037", category: "Installation Solar Panel", name: "ติดตั้งระบบไฟฟ้าฝั่ง AC - อาคาร D", assignedTo: "Hayden Cook", plannedStart: "2024-11-14", plannedEnd: "2024-11-19", duration: 6, actualStart: "", actualEnd: "", progress: 0, weight: 1.8, notes: "" }
+      { id: "T001", category: "Initial Project", name: "ขออนุมัติเอกสารของโครงการ", assignedTo: "Gokce Aslan", plannedStart: "2024-07-25", plannedEnd: "2024-07-30", duration: 6, actualStart: "2024-07-25", actualEnd: "2024-07-31", progress: 100, weight: 1.5, value: null, notes: "" },
+      { id: "T002", category: "Initial Project", name: "รื้อถอนอุปกรณ์เดิม", assignedTo: "Hayden Cook", plannedStart: "2024-07-30", plannedEnd: "2024-08-06", duration: 8, actualStart: "2024-07-30", actualEnd: "2024-08-07", progress: 100, weight: 2.0, value: null, notes: "" },
+      { id: "T036", category: "Installation Solar Panel", name: "ติดตั้งระบบไฟฟ้าฝั่ง AC - อาคาร C", assignedTo: "Hayden Cook", plannedStart: "2024-11-09", plannedEnd: "2024-11-14", duration: 6, actualStart: "2024-11-09", actualEnd: "", progress: 60, weight: 1.8, value: null, notes: "กำลังเดินสายไฟ" },
+      { id: "T037", category: "Installation Solar Panel", name: "ติดตั้งระบบไฟฟ้าฝั่ง AC - อาคาร D", assignedTo: "Hayden Cook", plannedStart: "2024-11-14", plannedEnd: "2024-11-19", duration: 6, actualStart: "", actualEnd: "", progress: 0, weight: 1.8, value: null, notes: "" }
     ];
     const DEFAULT_DAILY_LOGS = [
       { id: "L001", date: "2024-07-25", workers: 0, activity: "เริ่มโครงการ ขออนุมัติเอกสาร", notes: "สภาพอากาศแจ่มใส" },
@@ -643,76 +656,156 @@
     ];
 
     const STORAGE_KEY = "AGY_PROJECT_PLANNER_DATA";
+    const THEME_KEY = "AGY_PROJECT_PLANNER_THEME";
+    const DAY_PX = 28;
+    const SC_PAD = { top: 25, right: 35, bottom: 45, left: 55 };
+    const clone = obj => JSON.parse(JSON.stringify(obj));
+
     let state = {
       project: Object.assign({}, DEFAULT_PROJECT),
-      tasks: JSON.parse(JSON.stringify(DEFAULT_TASKS)),
+      tasks: clone(DEFAULT_TASKS),
       categories: [],
-      dailyLogs: JSON.parse(JSON.stringify(DEFAULT_DAILY_LOGS)),
+      dailyLogs: clone(DEFAULT_DAILY_LOGS),
       activeTab: "tab-scurve",
-      chartSettings: { showPlanned: true, showActual: true, showForecast: true, interval: "daily" },
+      chartSettings: { showPlanned: true, showActual: true, showForecast: true },
       taskFilters: { search: "", category: "ALL", status: "ALL" }
     };
+
+    /* =========================================================
+       HELPERS: escaping, sanitizing, caching
+       ========================================================= */
+    function escapeHtml(v) { return String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+    // Safe argument for inline handlers: onclick="fn(${jsArg(id)})"
+    function jsArg(v) { return escapeHtml(JSON.stringify(String(v ?? ""))); }
+    function clampPct(v) { return Math.max(0, Math.min(100, parseFloat(v) || 0)); }
+    function hasValue(v) { return v !== null && v !== undefined && v !== ""; }
+    function isDateStr(v) { return typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v); }
+
+    function sanitizeTask(t, i) {
+      t = t || {};
+      const value = hasValue(t.value) && Number.isFinite(parseFloat(t.value)) ? Math.max(0, parseFloat(t.value)) : null;
+      return {
+        id: String(t.id || `T${Date.now()}_${i}`),
+        category: String(t.category || "General").trim() || "General",
+        name: String(t.name || "(ไม่มีชื่องาน)"),
+        assignedTo: String(t.assignedTo || ""),
+        plannedStart: isDateStr(t.plannedStart) ? t.plannedStart : "",
+        plannedEnd: isDateStr(t.plannedEnd) ? t.plannedEnd : "",
+        duration: parseInt(t.duration, 10) || 1,
+        actualStart: isDateStr(t.actualStart) ? t.actualStart : "",
+        actualEnd: isDateStr(t.actualEnd) ? t.actualEnd : "",
+        progress: clampPct(t.progress),
+        weight: Math.max(0, parseFloat(t.weight) || 0),
+        value,
+        notes: String(t.notes || "")
+      };
+    }
+    function sanitizeLog(l, i) {
+      l = l || {};
+      return { id: String(l.id || `L${Date.now()}_${i}`), date: isDateStr(l.date) ? l.date : "", workers: Math.max(0, parseInt(l.workers, 10) || 0), activity: String(l.activity || ""), notes: String(l.notes || "") };
+    }
+    function applyData(data) {
+      state.project = Object.assign({}, DEFAULT_PROJECT, data.project || {});
+      state.project.totalValue = Math.max(0, parseFloat(state.project.totalValue) || 0);
+      if (state.project.weightMode !== "manual") state.project.weightMode = "duration";
+      // Make task IDs unique (duplicate IDs break edit/delete/drag).
+      const seen = new Set();
+      state.tasks = (Array.isArray(data.tasks) ? data.tasks : []).map((t, i) => {
+        const task = sanitizeTask(t, i);
+        while (seen.has(task.id)) task.id = `${task.id}_${i}`;
+        seen.add(task.id);
+        return task;
+      });
+      state.categories = Array.isArray(data.categories) ? data.categories.map(c => String(c || "").trim()).filter(Boolean) : [];
+      state.dailyLogs = (Array.isArray(data.dailyLogs) ? data.dailyLogs : []).map(sanitizeLog).filter(l => l.date);
+      normalizeWeights();
+      invalidateCaches();
+    }
+
+    let timelineCache = null, valueCtxCache = null;
+    function invalidateCaches() { timelineCache = null; valueCtxCache = null; }
+    function getTimeline() { if (!timelineCache) timelineCache = calculateProjectTimeline(); return timelineCache; }
 
     function loadState() {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (parsed && parsed.project && Array.isArray(parsed.tasks)) {
-            state.project = parsed.project;
-            state.project.totalValue = Math.max(0, parseFloat(state.project.totalValue) || 0);
-            state.tasks = parsed.tasks;
-            state.categories = Array.isArray(parsed.categories) ? parsed.categories : [];
-            if (Array.isArray(parsed.dailyLogs)) state.dailyLogs = parsed.dailyLogs;
-          }
+          if (parsed && parsed.project && Array.isArray(parsed.tasks)) { applyData(parsed); return; }
         }
-      } catch (e) { console.warn(e); }
+      } catch (e) { console.warn("โหลดข้อมูลไม่สำเร็จ", e); }
+      normalizeWeights();
     }
-    function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ project: state.project, tasks: state.tasks, categories: state.categories, dailyLogs: state.dailyLogs })); }
+    let storageWarned = false;
+    function saveState() {
+      normalizeWeights();
+      invalidateCaches();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ project: state.project, tasks: state.tasks, categories: state.categories, dailyLogs: state.dailyLogs }));
+      } catch (e) {
+        console.warn(e);
+        if (!storageWarned) { storageWarned = true; showToast("⚠️ บันทึกลงเบราว์เซอร์ไม่ได้ — กรุณาส่งออก JSON เก็บไว้"); }
+      }
+    }
     function resetToSampleData() {
-      if (confirm("คุณต้องการกู้คืนข้อมูลตัวอย่างโครงการ (PVCell Project) กลับมาใช่หรือไม่?")) {
-        state.project = Object.assign({}, DEFAULT_PROJECT);
-        state.tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
-        state.dailyLogs = JSON.parse(JSON.stringify(DEFAULT_DAILY_LOGS));
-        saveState(); initApp(); showToast("กู้คืนข้อมูลตัวอย่างเรียบร้อยแล้ว");
+      if (confirm("คุณต้องการกู้คืนข้อมูลตัวอย่างโครงการ (PVCell Project) กลับมาใช่หรือไม่?\nข้อมูลปัจจุบันจะถูกแทนที่")) {
+        applyData({ project: DEFAULT_PROJECT, tasks: clone(DEFAULT_TASKS), categories: [], dailyLogs: clone(DEFAULT_DAILY_LOGS) });
+        saveState(); closeProjectSettingsModal(); refreshAll(); showToast("กู้คืนข้อมูลตัวอย่างเรียบร้อยแล้ว");
       }
     }
 
     /* =========================================================
-       DATE UTILS
+       DATE UTILS (แสดงผลเป็น พ.ศ. ทั้งระบบ)
        ========================================================= */
-    function parseDate(str) { if (!str) return null; const parts = str.split("-"); if (parts.length !== 3) return null; return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)); }
+    const MONTHS_TH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+    const MONTHS_TH_LONG = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    const DAYS_TH = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+    function parseDate(str) { if (!isDateStr(str)) return null; const p = str.split("-"); const d = new Date(+p[0], +p[1] - 1, +p[2]); return isNaN(d.getTime()) ? null : d; }
     function formatDate(d) { if (!d || isNaN(d.getTime())) return ""; return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
     function formatThaiDate(d, short = false) {
       if (!d) return "-"; if (typeof d === "string") d = parseDate(d); if (!d || isNaN(d.getTime())) return "-";
-      const monthsTh = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-      return `${d.getDate()} ${monthsTh[d.getMonth()]} ${d.getFullYear()}`;
+      const be = d.getFullYear() + 543;
+      return `${d.getDate()} ${MONTHS_TH[d.getMonth()]} ${short ? String(be).slice(-2) : be}`;
     }
     function diffDays(d1, d2) { if (!d1 || !d2) return 0; return Math.round((Date.UTC(d2.getFullYear(), d2.getMonth(), d2.getDate()) - Date.UTC(d1.getFullYear(), d1.getMonth(), d1.getDate())) / 86400000); }
     function addDays(d, n) { const res = new Date(d.getTime()); res.setDate(res.getDate() + n); return res; }
+    function today() { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+
+    /* =========================================================
+       VALUE (บาท)
+       ========================================================= */
     const bahtFormatter = new Intl.NumberFormat("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     function formatBaht(value) { return `${bahtFormatter.format(Math.max(0, Number(value) || 0))} บาท`; }
+    function getValueContext() {
+      if (valueCtxCache) return valueCtxCache;
+      let manualValue = 0, remainingWeight = 0;
+      state.tasks.forEach(t => {
+        if (hasValue(t.value)) manualValue += Math.max(0, Number(t.value) || 0);
+        else remainingWeight += Number(t.weight) || 0;
+      });
+      valueCtxCache = { remainingValue: Math.max(0, (Number(state.project.totalValue) || 0) - manualValue), remainingWeight };
+      return valueCtxCache;
+    }
     function getTaskValue(task) {
-      if (task.value !== null && task.value !== undefined && task.value !== "") return Math.max(0, Number(task.value) || 0);
-      const unpricedTasks = state.tasks.filter(item => item.value === null || item.value === undefined || item.value === "");
-      const manualValue = state.tasks.reduce((sum, item) => sum + (item.value !== null && item.value !== undefined && item.value !== "" ? Math.max(0, Number(item.value) || 0) : 0), 0);
-      const remainingValue = Math.max(0, (Number(state.project.totalValue) || 0) - manualValue);
-      const remainingWeight = unpricedTasks.reduce((sum, item) => sum + (Number(item.weight) || 0), 0);
-      return remainingWeight > 0 ? remainingValue * (Number(task.weight) || 0) / remainingWeight : 0;
+      if (hasValue(task.value)) return Math.max(0, Number(task.value) || 0);
+      const ctx = getValueContext();
+      return ctx.remainingWeight > 0 ? ctx.remainingValue * (Number(task.weight) || 0) / ctx.remainingWeight : 0;
     }
     function getProjectValueTotals() {
       return state.tasks.reduce((totals, task) => {
         const value = getTaskValue(task);
         totals.budget += value;
-        totals.earned += value * Math.max(0, Math.min(100, Number(task.progress) || 0)) / 100;
+        totals.earned += value * clampPct(task.progress) / 100;
         return totals;
       }, { budget: 0, earned: 0 });
     }
+    function taskValueCellHtml(task, progress = task.progress) {
+      const total = getTaskValue(task), earned = total * clampPct(progress) / 100;
+      return total > 0 ? `<strong style="color:var(--success);">${formatBaht(earned)}</strong><div style="font-size:.72rem;color:var(--text-muted);">จาก ${formatBaht(total)}</div>` : `<span style="color:var(--text-muted);">กรอกมูลค่างาน</span>`;
+    }
     function updateTaskValueCell(task, progress = task.progress) {
       const cell = document.getElementById(`task-value-${task.id}`); if (!cell) return;
-      const total = getTaskValue(task), earned = total * (Math.max(0, Math.min(100, Number(progress) || 0)) / 100);
-      cell.innerHTML = total > 0 ? `<strong style="color:var(--success);">${formatBaht(earned)}</strong><div style="font-size:.72rem;color:var(--text-muted);">จาก ${formatBaht(total)}</div>` : `<span style="color:var(--text-muted);">กรอกมูลค่างาน</span>`;
-      cell.title = `มูลค่าที่ทำได้ ${formatBaht(earned)} จากมูลค่างาน ${formatBaht(total)}`;
+      cell.innerHTML = taskValueCellHtml(task, progress);
     }
 
     /* =========================================================
@@ -726,6 +819,7 @@
       e.dataTransfer.setData("text/plain", id);
     }
     function dragOver(e) {
+      if (!draggedTaskId) return;
       e.preventDefault();
       e.dataTransfer.dropEffect = "move";
       const tr = e.currentTarget.closest("tr");
@@ -733,305 +827,354 @@
     }
     function dragLeave(e) {
       const tr = e.currentTarget.closest("tr");
-      if (tr) tr.classList.remove("drag-over");
+      // ignore leave events fired when moving between cells of the same row (flicker)
+      if (tr && !tr.contains(e.relatedTarget)) tr.classList.remove("drag-over");
     }
     function drop(e, targetId) {
       e.preventDefault();
       const tr = e.currentTarget.closest("tr");
       if (tr) tr.classList.remove("drag-over");
-      
       if (draggedTaskId && draggedTaskId !== targetId) {
         const fromIdx = state.tasks.findIndex(t => t.id === draggedTaskId);
         const toIdx = state.tasks.findIndex(t => t.id === targetId);
         if (fromIdx > -1 && toIdx > -1) {
           const moved = state.tasks.splice(fromIdx, 1)[0];
           state.tasks.splice(toIdx, 0, moved);
-          saveState();
-          renderTasks();
-          if (state.activeTab === "tab-gantt") renderGantt();
+          saveState(); renderTasks(); refreshViews();
           showToast("ย้ายลำดับสำเร็จ");
         }
       }
     }
     function dragEnd(e) {
       e.currentTarget.classList.remove("dragging");
+      e.currentTarget.setAttribute("draggable", "false");
       document.querySelectorAll(".task-row-item").forEach(el => el.classList.remove("drag-over"));
       draggedTaskId = null;
     }
 
     /* =========================================================
-       RESIZABLE COLUMNS JS
+       RESIZABLE COLUMNS
        ========================================================= */
     function initResizableColumns() {
       const table = document.getElementById("task-list-table");
       if (!table) return;
-      const cols = table.querySelectorAll("th");
-      
-      cols.forEach(col => {
-        if (col.querySelector('.resizer')) return; 
+      table.querySelectorAll("th").forEach(col => {
+        if (col.querySelector(".resizer")) return;
         const resizer = document.createElement("div");
         resizer.classList.add("resizer");
         col.appendChild(resizer);
-        
-        let x = 0;
-        let w = 0;
-        
-        const mouseDownHandler = function(e) {
-          x = e.clientX;
-          const styles = window.getComputedStyle(col);
-          w = parseInt(styles.width, 10);
-          
-          document.addEventListener("mousemove", mouseMoveHandler);
-          document.addEventListener("mouseup", mouseUpHandler);
-          resizer.classList.add("resizing");
+        let x = 0, w = 0;
+        const mouseMoveHandler = e => {
+          const newWidth = Math.max(35, w + e.clientX - x);
+          col.style.width = col.style.minWidth = col.style.maxWidth = `${newWidth}px`;
         };
-        
-        const mouseMoveHandler = function(e) {
-          const dx = e.clientX - x;
-          const newWidth = Math.max(35, w + dx); 
-          col.style.width = `${newWidth}px`;
-          col.style.minWidth = `${newWidth}px`;
-          col.style.maxWidth = `${newWidth}px`;
-        };
-        
-        const mouseUpHandler = function() {
+        const mouseUpHandler = () => {
           resizer.classList.remove("resizing");
+          document.body.style.userSelect = "";
           document.removeEventListener("mousemove", mouseMoveHandler);
           document.removeEventListener("mouseup", mouseUpHandler);
         };
-        
-        resizer.addEventListener("mousedown", mouseDownHandler);
+        resizer.addEventListener("mousedown", e => {
+          e.preventDefault(); e.stopPropagation();
+          x = e.clientX; w = col.getBoundingClientRect().width;
+          document.body.style.userSelect = "none";
+          document.addEventListener("mousemove", mouseMoveHandler);
+          document.addEventListener("mouseup", mouseUpHandler);
+          resizer.classList.add("resizing");
+        });
       });
     }
 
     /* =========================================================
        CALCULATIONS
        ========================================================= */
+    function taskDuration(t) { const s = parseDate(t.plannedStart), e = parseDate(t.plannedEnd); return (s && e) ? Math.max(1, diffDays(s, e) + 1) : 1; }
+    function durationWeights() {
+      const durs = state.tasks.map(taskDuration), total = durs.reduce((a, b) => a + b, 0);
+      return durs.map(d => total > 0 ? parseFloat(((d / total) * 100).toFixed(2)) : 0);
+    }
+    // Duration is always derived from the planned dates; weights only in "duration" mode.
     function normalizeWeights() {
-      if (state.tasks.length === 0) return;
-      if (state.project.weightMode === "duration") {
-        let totalDur = 0;
-        state.tasks.forEach(t => {
-          const s = parseDate(t.plannedStart), e = parseDate(t.plannedEnd);
-          t.duration = (s && e) ? Math.max(1, diffDays(s, e) + 1) : 1;
-          totalDur += t.duration;
-        });
-        if (totalDur > 0) state.tasks.forEach(t => t.weight = parseFloat(((t.duration / totalDur) * 100).toFixed(2)));
+      state.tasks.forEach(t => { t.duration = taskDuration(t); });
+      if (state.project.weightMode === "duration" && state.tasks.length) {
+        const w = durationWeights();
+        state.tasks.forEach((t, i) => { t.weight = w[i]; });
       }
     }
 
     function calculateProjectTimeline() {
-      normalizeWeights();
       let pStart = parseDate(state.project.startDate), pEnd = parseDate(state.project.endDate);
-      state.tasks.forEach(t => {
-        const ts = parseDate(t.plannedStart), te = parseDate(t.plannedEnd);
-        if (ts && (!pStart || ts < pStart)) pStart = ts;
-        if (te && (!pEnd || te > pEnd)) pEnd = te;
+      const items = state.tasks.map(t => {
+        const s = parseDate(t.plannedStart), e = parseDate(t.plannedEnd);
+        if (s && (!pStart || s < pStart)) pStart = s;
+        if (e && (!pEnd || e > pEnd)) pEnd = e;
+        return { s, e, as: parseDate(t.actualStart) || s, ae: parseDate(t.actualEnd), w: Math.max(0, parseFloat(t.weight) || 0), prog: clampPct(t.progress) };
       });
-      if (!pStart) pStart = new Date();
+      if (!pStart) pStart = today();
       if (!pEnd || pEnd < pStart) pEnd = addDays(pStart, 30);
 
       const statusDate = parseDate(state.project.statusDate) || pStart;
-      const dates = []; let cur = new Date(pStart.getTime()); let safety = 0;
-      while (cur <= pEnd && safety < 3650) { dates.push(new Date(cur.getTime())); cur = addDays(cur, 1); safety++; }
+      const statusIdx = diffDays(pStart, statusDate);
+      // Extend the chart to the status date when it lies after the planned finish.
+      const chartEnd = (statusDate > pEnd && statusIdx < 3650) ? statusDate : pEnd;
+      const dates = []; let cur = new Date(pStart.getTime());
+      while (cur <= chartEnd && dates.length < 3660) { dates.push(new Date(cur.getTime())); cur = addDays(cur, 1); }
 
-      const totalWeight = state.tasks.reduce((sum, t) => sum + (parseFloat(t.weight) || 0), 0) || 100;
-      const plannedSeries = [], actualSeries = [], forecastSeries = [];
-
-      dates.forEach(d => {
-        let plannedSum = 0;
-        state.tasks.forEach(t => {
-          const s = parseDate(t.plannedStart), e = parseDate(t.plannedEnd), w = parseFloat(t.weight) || 0;
-          if (!s || !e) return;
-          let taskPlan = d < s ? 0 : d >= e ? 100 : Math.min(100, ((diffDays(s, d) + 1) / (diffDays(s, e) + 1)) * 100);
-          plannedSum += (w * taskPlan);
-        });
-        plannedSeries.push({ date: d, dateStr: formatDate(d), plannedPct: Math.min(100, parseFloat((plannedSum / totalWeight).toFixed(2))) });
-
-        if (d <= statusDate) {
-          let actualSum = 0;
-          const isStatusPoint = formatDate(d) === formatDate(statusDate);
-          state.tasks.forEach(t => {
-            const as = parseDate(t.actualStart) || parseDate(t.plannedStart), ae = parseDate(t.actualEnd) || parseDate(t.plannedEnd);
-            const prog = parseFloat(t.progress) || 0, w = parseFloat(t.weight) || 0;
-            if (!as) return;
-            let taskActual = 0;
-            // The entered progress is authoritative on the assessment date,
-            // even when a task's recorded start/end dates are inconsistent.
-            if (isStatusPoint) {
-              taskActual = prog;
-            } else if (prog > 0 && d >= as) {
-              const targetEnd = (prog >= 100 && ae) ? ae : statusDate;
-              if (d >= targetEnd) taskActual = prog;
-              else taskActual = Math.min(prog, ((diffDays(as, d) + 1) / Math.max(1, diffDays(as, targetEnd) + 1)) * prog);
-            }
-            actualSum += (w * taskActual);
-          });
-          actualSeries.push({ date: d, dateStr: formatDate(d), actualPct: Math.min(100, parseFloat((actualSum / totalWeight).toFixed(2))) });
-        }
+      let totalWeight = items.reduce((sum, it) => sum + it.w, 0);
+      if (totalWeight <= 0) { items.forEach(it => it.w = 1); totalWeight = items.length || 1; }
+      items.forEach(it => {
+        it.sIdx = it.s ? diffDays(pStart, it.s) : null;
+        it.eIdx = it.e ? diffDays(pStart, it.e) : null;
+        it.asIdx = it.as ? diffDays(pStart, it.as) : null;
+        it.aeIdx = it.ae ? diffDays(pStart, it.ae) : null;
       });
 
-      const currentPlanned = plannedSeries.find(item => item.dateStr === state.project.statusDate) || plannedSeries[plannedSeries.length - 1];
-      const currentActual = actualSeries[actualSeries.length - 1] || { actualPct: 0 };
-      const plannedAtStatus = currentPlanned ? currentPlanned.plannedPct : 0;
-      const actualAtStatus = currentActual ? currentActual.actualPct : 0;
+      const plannedAt = idx => {
+        let sum = 0;
+        items.forEach(it => {
+          if (it.sIdx === null || it.eIdx === null) return;
+          const span = Math.max(1, it.eIdx - it.sIdx + 1);
+          const p = idx < it.sIdx ? 0 : idx >= it.eIdx ? 100 : ((idx - it.sIdx + 1) / span) * 100;
+          sum += it.w * p;
+        });
+        return Math.min(100, sum / totalWeight);
+      };
+      const actualAt = idx => {
+        let sum = 0;
+        items.forEach(it => {
+          if (it.prog <= 0 || it.asIdx === null) return;
+          let a;
+          if (idx >= statusIdx) a = it.prog;               // progress entered is authoritative at the status date
+          else if (idx < it.asIdx) a = 0;
+          else {
+            const endIdx = (it.prog >= 100 && it.aeIdx !== null) ? Math.min(it.aeIdx, statusIdx) : statusIdx;
+            a = idx >= endIdx ? it.prog : Math.min(it.prog, ((idx - it.asIdx + 1) / Math.max(1, endIdx - it.asIdx + 1)) * it.prog);
+          }
+          sum += it.w * a;
+        });
+        return Math.min(100, sum / totalWeight);
+      };
 
-      let earnedDate = pStart;
-      for (let i = 0; i < plannedSeries.length; i++) {
-        if (plannedSeries[i].plannedPct >= actualAtStatus) { earnedDate = plannedSeries[i].date; break; }
-        if (i === plannedSeries.length - 1) earnedDate = plannedSeries[i].date;
+      const round2 = v => Math.round(v * 100) / 100;
+      const plannedSeries = dates.map((d, idx) => ({ idx, date: d, dateStr: formatDate(d), plannedPct: round2(plannedAt(idx)) }));
+      const actualSeries = [];
+      for (let idx = 0; idx <= Math.min(statusIdx, dates.length - 1); idx++) actualSeries.push({ idx, date: dates[idx], dateStr: formatDate(dates[idx]), actualPct: round2(actualAt(idx)) });
+
+      const plannedAtStatus = round2(plannedAt(statusIdx));
+      const actualAtStatus = round2(items.reduce((s, it) => s + it.w * it.prog, 0) / totalWeight);
+
+      // Earned schedule: the date on which the plan reached today's actual %.
+      let earnedDate = statusDate, daysVariance = 0;
+      if (plannedAtStatus > 0 || actualAtStatus > 0) {
+        let esIdx = plannedSeries.length - 1;
+        for (let i = 0; i < plannedSeries.length; i++) { if (plannedSeries[i].plannedPct >= actualAtStatus - 0.005) { esIdx = i; break; } }
+        if (actualAtStatus <= 0) { esIdx = 0; for (let i = 0; i < plannedSeries.length; i++) { if (plannedSeries[i].plannedPct > 0) { esIdx = Math.max(0, i - 1); break; } } }
+        earnedDate = dates[esIdx] || statusDate;
+        daysVariance = diffDays(statusDate, earnedDate);
+        if (actualAtStatus >= 100 && daysVariance < 0) daysVariance = 0;
       }
 
-      if (actualAtStatus > 0 && actualAtStatus < 100) {
-        const elapsed = Math.max(1, diffDays(pStart, statusDate));
+      // Forecast: linear extrapolation of the average progress rate so far.
+      const forecastSeries = []; let forecastEnd = null;
+      if (actualAtStatus > 0 && actualAtStatus < 100 && statusIdx >= 0) {
+        const firstStart = Math.max(0, Math.min(...items.filter(it => it.prog > 0 && it.asIdx !== null).map(it => it.asIdx)));
+        const elapsed = Math.max(1, statusIdx - (Number.isFinite(firstStart) ? firstStart : 0) + 1);
         const rate = actualAtStatus / elapsed;
-        const remainDays = Math.min(1000, Math.max(1, Math.ceil((100 - actualAtStatus) / Math.max(0.05, rate))));
-        forecastSeries.push({ date: statusDate, dateStr: formatDate(statusDate), forecastPct: actualAtStatus });
-        let fDate = new Date(statusDate.getTime());
-        for (let i = 1; i <= remainDays; i++) {
-          fDate = addDays(fDate, 1);
-          const fPct = Math.min(100, parseFloat((actualAtStatus + (i * rate)).toFixed(2)));
-          forecastSeries.push({ date: new Date(fDate.getTime()), dateStr: formatDate(fDate), forecastPct: fPct });
+        const remainDays = Math.min(1500, Math.max(1, Math.ceil((100 - actualAtStatus) / Math.max(0.01, rate))));
+        for (let i = 0; i <= remainDays; i++) {
+          const fPct = Math.min(100, round2(actualAtStatus + i * rate));
+          forecastSeries.push({ idx: statusIdx + i, date: addDays(statusDate, i), forecastPct: fPct });
           if (fPct >= 100) break;
         }
-      }
+        forecastEnd = forecastSeries[forecastSeries.length - 1].date;
+      } else if (actualAtStatus >= 100) forecastEnd = null;
 
-      return { pStart, pEnd, statusDate, totalDays: diffDays(pStart, pEnd) + 1, elapsedDays: Math.max(0, diffDays(pStart, statusDate) + 1), dates, plannedSeries, actualSeries, forecastSeries, plannedAtStatus, actualAtStatus, variancePct: parseFloat((actualAtStatus - plannedAtStatus).toFixed(2)), daysVariance: diffDays(statusDate, earnedDate), earnedDate };
+      return {
+        pStart, pEnd, statusDate, statusIdx, chartEnd, dates, plannedSeries, actualSeries, forecastSeries, forecastEnd, plannedAt,
+        totalDays: diffDays(pStart, pEnd) + 1, elapsedDays: Math.max(0, statusIdx + 1),
+        plannedAtStatus, actualAtStatus, variancePct: round2(actualAtStatus - plannedAtStatus), daysVariance, earnedDate
+      };
     }
 
     /* =========================================================
        CHART RENDERING (S-Curve & Manpower)
        ========================================================= */
     let chartHoverInfo = null;
-    function renderCharts() { const tl = calculateProjectTimeline(); updateKPICards(tl); drawSCurveCanvas(tl); drawManpowerCanvas(); renderVarianceAnalysis(tl); }
-    
+    function renderCharts() { const tl = getTimeline(); updateKPICards(tl); drawSCurveCanvas(tl); renderVarianceAnalysis(tl); drawManpowerCanvas(); }
+    function cssVar(name) { return getComputedStyle(document.body).getPropertyValue(name).trim(); }
+    // X-axis domain: project days, extended to the forecast finish (max 3× project length).
+    function chartDomainMax(tl) {
+      let max = Math.max(1, tl.dates.length - 1);
+      if (state.chartSettings.showForecast && tl.forecastSeries.length) max = Math.max(max, Math.min(tl.forecastSeries[tl.forecastSeries.length - 1].idx, max * 3));
+      return max;
+    }
+
     function drawSCurveCanvas(tl) {
       const canvas = document.getElementById("scurve-canvas"); if (!canvas) return;
       const rect = canvas.parentElement.getBoundingClientRect(); if (!rect || rect.width <= 0) return;
       const ctx = canvas.getContext("2d"), dpr = window.devicePixelRatio || 1;
-      const W = rect.width, H = rect.height; canvas.width = W * dpr; canvas.height = H * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, W, H);
+      const W = rect.width, H = rect.height; canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // Solid background so the exported PNG is not transparent.
+      ctx.fillStyle = cssVar("--bg-card") || "#ffffff"; ctx.fillRect(0, 0, W, H);
 
-      const pad = { top: 25, right: 35, bottom: 45, left: 55 }, plotW = W - pad.left - pad.right, plotH = H - pad.top - pad.bottom;
+      const pad = SC_PAD, plotW = W - pad.left - pad.right, plotH = H - pad.top - pad.bottom;
       const isDark = document.body.getAttribute("data-theme") === "dark", gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", textColor = isDark ? "#94a3b8" : "#64748b";
+      const font = "Prompt, sans-serif";
 
-      ctx.font = "11px sans-serif"; ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      ctx.font = `11px ${font}`; ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.lineWidth = 1;
       for (let yPct = 0; yPct <= 100; yPct += 20) {
         const y = pad.top + plotH - (yPct / 100) * plotH;
         ctx.strokeStyle = gridColor; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + plotW, y); ctx.stroke();
         ctx.fillStyle = textColor; ctx.fillText(yPct + "%", pad.left - 10, y);
       }
 
-      if (state.tasks.length === 0) { ctx.fillStyle = textColor; ctx.textAlign="center"; ctx.fillText("ยังไม่มีรายการงานในโครงการ", W/2, H/2); return; }
+      if (state.tasks.length === 0) { ctx.fillStyle = textColor; ctx.textAlign = "center"; ctx.fillText("ยังไม่มีรายการงานในโครงการ", W / 2, H / 2); return; }
 
-      const pts = tl.dates.length; if (pts < 2) return;
-      const getX = d => pad.left + Math.max(0, Math.min(plotW, (diffDays(tl.pStart, d) / (pts - 1)) * plotW));
+      const maxIdx = chartDomainMax(tl);
+      const getX = idx => pad.left + Math.max(0, Math.min(plotW, (idx / maxIdx) * plotW));
       const getY = pct => pad.top + plotH - (pct / 100) * plotH;
 
       ctx.textAlign = "center"; ctx.textBaseline = "top";
-      const step = Math.max(1, Math.ceil(pts / Math.floor(plotW / 90)));
-      for (let i = 0; i < pts; i += step) {
-        const x = getX(tl.dates[i]);
+      const step = Math.max(1, Math.ceil((maxIdx + 1) / Math.max(1, Math.floor(plotW / 90))));
+      for (let i = 0; i <= maxIdx; i += step) {
+        const x = getX(i);
         ctx.strokeStyle = gridColor; ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + plotH); ctx.stroke();
-        ctx.fillStyle = textColor; ctx.fillText(formatThaiDate(tl.dates[i], true), x, pad.top + plotH + 8);
-      }
-
-      const sX = getX(tl.statusDate);
-      if (sX >= pad.left && sX <= pad.left + plotW) {
-        ctx.setLineDash([5, 4]); ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(sX, pad.top); ctx.lineTo(sX, pad.top + plotH); ctx.stroke();
-        ctx.setLineDash([]); ctx.fillStyle = "#ef4444"; ctx.fillRect(sX - 45, pad.top - 20, 90, 18);
-        ctx.fillStyle = "#fff"; ctx.font = "bold 10px sans-serif"; ctx.textBaseline = "middle"; ctx.fillText("วันประเมินผล", sX, pad.top - 11);
+        ctx.fillStyle = textColor; ctx.fillText(formatThaiDate(addDays(tl.pStart, i), true), x, pad.top + plotH + 8);
       }
 
       const drawCurve = (series, pctKey, color, fillGrad, isDashed) => {
         if (!series || series.length < 2) return;
         if (fillGrad) {
-          ctx.beginPath(); ctx.moveTo(getX(series[0].date), pad.top + plotH);
-          series.forEach(pt => ctx.lineTo(getX(pt.date), getY(pt[pctKey])));
-          ctx.lineTo(getX(series[series.length-1].date), pad.top + plotH); ctx.closePath();
+          ctx.beginPath(); ctx.moveTo(getX(series[0].idx), pad.top + plotH);
+          series.forEach(pt => ctx.lineTo(getX(pt.idx), getY(pt[pctKey])));
+          ctx.lineTo(getX(series[series.length - 1].idx), pad.top + plotH); ctx.closePath();
           ctx.fillStyle = fillGrad; ctx.fill();
         }
         ctx.beginPath();
-        series.forEach((pt, i) => { const x = getX(pt.date), y = getY(pt[pctKey]); if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
-        ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.setLineDash(isDashed ? [6,5] : []); ctx.stroke(); ctx.setLineDash([]);
+        series.forEach((pt, i) => { const x = getX(pt.idx), y = getY(pt[pctKey]); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
+        ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.setLineDash(isDashed ? [6, 5] : []); ctx.stroke(); ctx.setLineDash([]);
       };
 
       if (state.chartSettings.showPlanned) {
-        let grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
+        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
         grad.addColorStop(0, isDark ? "rgba(59,130,246,0.22)" : "rgba(59,130,246,0.12)"); grad.addColorStop(1, "rgba(59,130,246,0)");
-        drawCurve(tl.plannedSeries, 'plannedPct', '#2563eb', grad, false);
+        // planned stays at 100% after the planned finish when the axis is extended
+        const series = tl.plannedSeries.slice();
+        if (maxIdx > series.length - 1 && series.length) series.push({ idx: maxIdx, plannedPct: series[series.length - 1].plannedPct });
+        drawCurve(series, "plannedPct", "#2563eb", grad, false);
       }
       if (state.chartSettings.showActual) {
-        let grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
+        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
         grad.addColorStop(0, isDark ? "rgba(16,185,129,0.3)" : "rgba(16,185,129,0.18)"); grad.addColorStop(1, "rgba(16,185,129,0)");
-        drawCurve(tl.actualSeries, 'actualPct', '#10b981', grad, false);
-        const last = tl.actualSeries[tl.actualSeries.length-1];
-        if (last) { ctx.fillStyle="#10b981"; ctx.beginPath(); ctx.arc(getX(last.date), getY(last.actualPct), 5.5, 0, Math.PI*2); ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle="#fff"; ctx.stroke(); }
+        drawCurve(tl.actualSeries, "actualPct", "#10b981", grad, false);
+        const last = tl.actualSeries[tl.actualSeries.length - 1];
+        if (last) { ctx.fillStyle = "#10b981"; ctx.beginPath(); ctx.arc(getX(last.idx), getY(last.actualPct), 5.5, 0, Math.PI * 2); ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#fff"; ctx.stroke(); }
       }
-      if (state.chartSettings.showForecast) drawCurve(tl.forecastSeries, 'forecastPct', '#f59e0b', null, true);
+      if (state.chartSettings.showForecast) drawCurve(tl.forecastSeries.filter(p => p.idx <= maxIdx), "forecastPct", "#f59e0b", null, true);
+
+      // Status-date cutoff line (drawn last so it is never hidden by fills)
+      const sX = getX(tl.statusIdx);
+      if (tl.statusIdx >= 0 && tl.statusIdx <= maxIdx) {
+        ctx.setLineDash([5, 4]); ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(sX, pad.top); ctx.lineTo(sX, pad.top + plotH); ctx.stroke();
+        ctx.setLineDash([]);
+        const lx = Math.max(pad.left + 45, Math.min(W - 47, sX));
+        ctx.fillStyle = "#ef4444"; ctx.fillRect(lx - 45, pad.top - 20, 90, 18);
+        ctx.fillStyle = "#fff"; ctx.font = `bold 10px ${font}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("วันประเมินผล", lx, pad.top - 11);
+      }
 
       if (chartHoverInfo && chartHoverInfo.active) {
         const hx = chartHoverInfo.x;
         if (hx >= pad.left && hx <= pad.left + plotW) {
-          ctx.strokeStyle = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)"; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+          ctx.strokeStyle = isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)"; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
           ctx.beginPath(); ctx.moveTo(hx, pad.top); ctx.lineTo(hx, pad.top + plotH); ctx.stroke(); ctx.setLineDash([]);
-          if (chartHoverInfo.point) {
-            ctx.fillStyle = "#2563eb"; ctx.beginPath(); ctx.arc(hx, getY(chartHoverInfo.point.plannedPct), 4, 0, Math.PI*2); ctx.fill();
-            if (chartHoverInfo.point.actualPct !== null) { ctx.fillStyle = "#10b981"; ctx.beginPath(); ctx.arc(hx, getY(chartHoverInfo.point.actualPct), 4.5, 0, Math.PI*2); ctx.fill(); }
+          const pt = chartHoverInfo.point;
+          if (pt) {
+            if (state.chartSettings.showPlanned) { ctx.fillStyle = "#2563eb"; ctx.beginPath(); ctx.arc(hx, getY(pt.plannedPct), 4, 0, Math.PI * 2); ctx.fill(); }
+            if (pt.actualPct !== null && state.chartSettings.showActual) { ctx.fillStyle = "#10b981"; ctx.beginPath(); ctx.arc(hx, getY(pt.actualPct), 4.5, 0, Math.PI * 2); ctx.fill(); }
+            if (pt.forecastPct !== null && state.chartSettings.showForecast) { ctx.fillStyle = "#f59e0b"; ctx.beginPath(); ctx.arc(hx, getY(pt.forecastPct), 4, 0, Math.PI * 2); ctx.fill(); }
           }
         }
       }
     }
 
+    function toggleCurve(key) {
+      const map = { planned: "showPlanned", actual: "showActual", forecast: "showForecast" };
+      if (!map[key]) return;
+      state.chartSettings[map[key]] = !state.chartSettings[map[key]];
+      document.querySelectorAll(".legend-item").forEach(el => {
+        const m = (el.getAttribute("onclick") || "").match(/toggleCurve\('(\w+)'\)/);
+        if (m) el.classList.toggle("off", !state.chartSettings[map[m[1]]]);
+      });
+      drawSCurveCanvas(getTimeline());
+    }
+
     function setupCanvasHover() {
       const canvas = document.getElementById("scurve-canvas"), tooltip = document.getElementById("chart-tooltip");
       if (!canvas || !tooltip) return;
+      const hide = () => { chartHoverInfo = { active: false }; tooltip.style.display = "none"; drawSCurveCanvas(getTimeline()); };
       canvas.addEventListener("mousemove", e => {
         if (state.tasks.length === 0) return;
         const rect = canvas.getBoundingClientRect(); if (!rect || rect.width <= 0) return;
-        const x = e.clientX - rect.left, tl = calculateProjectTimeline(), pad = { top: 25, right: 35, bottom: 45, left: 55 }, plotW = rect.width - pad.left - pad.right;
-        if (x < pad.left || x > pad.left + plotW) { chartHoverInfo = { active: false }; tooltip.style.display = "none"; drawSCurveCanvas(tl); return; }
-        
-        const idx = Math.max(0, Math.min(tl.dates.length - 1, Math.round(((x - pad.left) / plotW) * (tl.dates.length - 1))));
-        const date = tl.dates[idx], pItem = tl.plannedSeries[idx], aItem = tl.actualSeries.find(i => i.dateStr === formatDate(date));
-        const pPct = pItem ? pItem.plannedPct : 0, aPct = aItem ? aItem.actualPct : null, variance = aPct !== null ? (aPct - pPct).toFixed(1) : null;
-        
-        chartHoverInfo = { active: true, x, y: e.clientY - rect.top, point: { date, plannedPct: pPct, actualPct: aPct, variance } };
-        tooltip.style.display = "block"; tooltip.style.left = `${e.clientX}px`; tooltip.style.top = `${e.clientY - 15}px`;
-        
+        const tl = getTimeline(), pad = SC_PAD, plotW = rect.width - pad.left - pad.right;
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        if (x < pad.left || x > pad.left + plotW) { hide(); return; }
+
+        const maxIdx = chartDomainMax(tl);
+        const idx = Math.max(0, Math.min(maxIdx, Math.round(((x - pad.left) / plotW) * maxIdx)));
+        const date = addDays(tl.pStart, idx);
+        const pPct = idx < tl.plannedSeries.length ? tl.plannedSeries[idx].plannedPct : (tl.plannedSeries.length ? tl.plannedSeries[tl.plannedSeries.length - 1].plannedPct : 0);
+        const aItem = tl.actualSeries[idx], aPct = aItem ? aItem.actualPct : null;
+        const fItem = tl.forecastSeries.find(f => f.idx === idx), fPct = fItem && idx > tl.statusIdx ? fItem.forecastPct : null;
+        const variance = aPct !== null ? aPct - pPct : null;
+
+        chartHoverInfo = { active: true, x, point: { plannedPct: pPct, actualPct: aPct, forecastPct: fPct } };
+        // Tooltip is absolutely positioned inside .canvas-container → use container-relative coords.
+        tooltip.style.display = "block";
+        tooltip.style.left = `${Math.max(100, Math.min(rect.width - 100, x))}px`;
+        tooltip.style.top = `${Math.max(110, y - 10)}px`;
+
         let html = `<div class="tooltip-date">📅 ${formatThaiDate(date)}</div><div class="tooltip-row"><span>แผนงานสะสม:</span><strong style="color:#60a5fa;">${pPct.toFixed(1)}%</strong></div>`;
         if (aPct !== null) {
-          const vColor = variance >= 0 ? "#34d399" : "#f87171", vText = variance >= 0 ? `+${variance}% (เร็วกว่าแผน)` : `${variance}% (ล่าช้ากว่าแผน)`;
+          const vColor = variance >= 0 ? "#34d399" : "#f87171", vText = variance >= 0 ? `+${variance.toFixed(1)}% (เร็วกว่าแผน)` : `${variance.toFixed(1)}% (ล่าช้ากว่าแผน)`;
           html += `<div class="tooltip-row"><span>ทำจริงสะสม:</span><strong style="color:#34d399;">${aPct.toFixed(1)}%</strong></div><div class="tooltip-row variance"><span>ผลต่าง (SV):</span><span style="color:${vColor};">${vText}</span></div>`;
-        } else { html += `<div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">* วันที่อยู่หลังวันประเมินผล</div>`; }
+        } else {
+          if (fPct !== null) html += `<div class="tooltip-row"><span>คาดการณ์:</span><strong style="color:#fbbf24;">${fPct.toFixed(1)}%</strong></div>`;
+          html += `<div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">* วันที่อยู่หลังวันประเมินผล</div>`;
+        }
         tooltip.innerHTML = html; drawSCurveCanvas(tl);
       });
-      canvas.addEventListener("mouseleave", () => { chartHoverInfo = { active: false }; tooltip.style.display = "none"; drawSCurveCanvas(calculateProjectTimeline()); });
+      canvas.addEventListener("mouseleave", hide);
     }
 
     function drawManpowerCanvas() {
       const canvas = document.getElementById("manpower-canvas"); if (!canvas) return;
       const rect = canvas.parentElement.getBoundingClientRect(); if (!rect || rect.width <= 0) return;
       const ctx = canvas.getContext("2d"), dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.scale(dpr, dpr); ctx.clearRect(0, 0, rect.width, rect.height);
-      const logs = [...state.dailyLogs].sort((a,b) => (a.date > b.date ? 1 : -1));
-      if (logs.length === 0) { ctx.fillStyle = "#94a3b8"; ctx.textAlign = "center"; ctx.fillText("ยังไม่มีข้อมูลกำลังคนหน้างาน", rect.width / 2, rect.height / 2); return; }
-      
-      const pad = { top: 20, right: 30, bottom: 40, left: 45 }, plotW = rect.width - pad.left - pad.right, plotH = rect.height - pad.top - pad.bottom;
-      const maxW = Math.max(10, Math.max(...logs.map(l => parseInt(l.workers) || 0)) + 2), isDark = document.body.getAttribute("data-theme") === "dark";
-      
-      ctx.font = "11px sans-serif"; ctx.textAlign = "right"; ctx.textBaseline = "middle";
-      for (let w = 0; w <= maxW; w += 4) {
+      canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, rect.width, rect.height);
+      const isDark = document.body.getAttribute("data-theme") === "dark", textColor = isDark ? "#94a3b8" : "#64748b";
+      ctx.font = "11px Prompt, sans-serif";
+      const logs = [...state.dailyLogs].sort((a, b) => (a.date > b.date ? 1 : -1));
+      if (logs.length === 0) { ctx.fillStyle = textColor; ctx.textAlign = "center"; ctx.fillText("ยังไม่มีข้อมูลกำลังคนหน้างาน", rect.width / 2, rect.height / 2); return; }
+
+      const pad = { top: 20, right: 30, bottom: 40, left: 50 }, plotW = rect.width - pad.left - pad.right, plotH = rect.height - pad.top - pad.bottom;
+      const peak = Math.max(...logs.map(l => parseInt(l.workers) || 0));
+      const gridStep = Math.max(1, Math.ceil(Math.max(10, peak) / 5));
+      const maxW = gridStep * Math.ceil((Math.max(10, peak) + 1) / gridStep);
+
+      ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      for (let w = 0; w <= maxW; w += gridStep) {
         const y = pad.top + plotH - (w / maxW) * plotH;
         ctx.strokeStyle = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"; ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + plotW, y); ctx.stroke();
-        ctx.fillStyle = isDark ? "#94a3b8" : "#64748b"; ctx.fillText(w + " คน", pad.left - 8, y);
+        ctx.fillStyle = textColor; ctx.fillText(w + " คน", pad.left - 8, y);
       }
-      
-      const barW = Math.min(24, Math.max(8, (plotW / logs.length) - 4));
+
+      const barW = Math.min(24, Math.max(4, (plotW / logs.length) - 4));
+      const labelEvery = Math.max(1, Math.ceil(logs.length / Math.max(1, Math.floor(plotW / 80))));
       logs.forEach((item, idx) => {
-        const x = pad.left + (idx / (logs.length - 1 || 1)) * (plotW - barW), barH = ((parseInt(item.workers)||0) / maxW) * plotH, y = pad.top + plotH - barH;
+        const x = pad.left + (idx / (logs.length - 1 || 1)) * (plotW - barW), barH = ((parseInt(item.workers) || 0) / maxW) * plotH, y = pad.top + plotH - barH;
         ctx.fillStyle = isDark ? "#818cf8" : "#6366f1"; ctx.fillRect(x, y, barW, barH);
-        if (idx % Math.ceil(logs.length / 8) === 0 || idx === logs.length - 1) {
-          ctx.fillStyle = isDark ? "#94a3b8" : "#64748b"; ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.fillText(formatThaiDate(item.date, true), x + barW / 2, pad.top + plotH + 8);
+        if (idx % labelEvery === 0 || idx === logs.length - 1) {
+          ctx.fillStyle = textColor; ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.fillText(formatThaiDate(item.date, true), x + barW / 2, pad.top + plotH + 8);
         }
       });
     }
@@ -1040,31 +1183,31 @@
        UI & KPI UPDATES
        ========================================================= */
     function updateKPICards(tl) {
-      if (!tl) tl = calculateProjectTimeline();
+      if (!tl) tl = getTimeline();
       document.getElementById("lbl-project-name").childNodes[0].nodeValue = state.project.name + " ";
+      document.title = `${state.project.name} — S-Curve Dashboard`;
       document.getElementById("lbl-project-lead").innerText = state.project.lead;
       document.getElementById("lbl-project-date-range").innerText = `${formatThaiDate(tl.pStart)} ถึง ${formatThaiDate(tl.pEnd)}`;
-      document.getElementById("status-date-input").value = state.project.statusDate;
+      document.getElementById("status-date-input").value = state.project.statusDate || "";
       document.getElementById("kpi-days-elapsed").innerHTML = `${tl.elapsedDays} <span class="unit">/ ${tl.totalDays} วัน</span>`;
-      document.getElementById("kpi-time-pct").innerText = `${Math.min(100, (tl.elapsedDays / tl.totalDays) * 100).toFixed(1)}%`;
+      document.getElementById("kpi-time-pct").innerText = `${Math.max(0, Math.min(100, (tl.elapsedDays / tl.totalDays) * 100)).toFixed(1)}%`;
       document.getElementById("kpi-planned-pct").innerHTML = `${tl.plannedAtStatus.toFixed(1)} <span class="unit">%</span>`;
       document.getElementById("kpi-actual-pct").innerHTML = `${tl.actualAtStatus.toFixed(1)} <span class="unit">%</span>`;
-      const actualValueLabel = document.getElementById("kpi-actual-value");
       const valueTotals = getProjectValueTotals();
-      if (actualValueLabel) actualValueLabel.innerHTML = `${bahtFormatter.format(valueTotals.earned)} <span class="unit">บาท</span>`;
-      const actualValueTotal = document.getElementById("kpi-actual-value-total");
-      if (actualValueTotal) actualValueTotal.textContent = valueTotals.budget > 0 ? `จากมูลค่างานทั้งหมด ${formatBaht(valueTotals.budget)}` : "กรอกมูลค่างานเพื่อแสดงยอดสะสม";
-      
+      document.getElementById("kpi-actual-value").innerHTML = `${bahtFormatter.format(valueTotals.earned)} <span class="unit">บาท</span>`;
+      document.getElementById("kpi-actual-value-total").textContent = valueTotals.budget > 0 ? `จากมูลค่างานทั้งหมด ${formatBaht(valueTotals.budget)}` : "กรอกมูลค่างานเพื่อแสดงยอดสะสม";
+
       const vVal = tl.variancePct, vBadge = document.getElementById("kpi-variance-badge"), vDays = document.getElementById("kpi-days-variance");
+      const absDays = Math.abs(tl.daysVariance);
       document.getElementById("kpi-variance-val").innerHTML = `${vVal > 0 ? "+" : ""}${vVal.toFixed(1)} <span class="unit">%</span>`;
-      if (vVal > 0.5) { vBadge.className = "badge badge-success"; vBadge.innerText = "เร็วกว่าแผนงาน"; vDays.innerText = `เร็วกว่า +${tl.daysVariance} วัน`; vDays.style.color = "var(--success)"; }
-      else if (vVal < -0.5) { vBadge.className = "badge badge-danger"; vBadge.innerText = "ล่าช้ากว่าแผน"; vDays.innerText = `ล่าช้า ${tl.daysVariance} วัน`; vDays.style.color = "var(--danger)"; }
-      else { vBadge.className = "badge badge-warning"; vBadge.innerText = "ตรงตามแผนงาน"; vDays.innerText = "ตามแผน (0 วัน)"; vDays.style.color = "var(--text-muted)"; }
-      
-      const tWorkers = state.dailyLogs.reduce((sum, l) => sum + (parseInt(l.workers)||0), 0);
+      if (vVal > 0.5) { vBadge.className = "badge badge-success"; vBadge.innerText = "เร็วกว่าแผนงาน"; vDays.innerText = `เร็วกว่า ${absDays} วัน`; vDays.style.color = "var(--success)"; }
+      else if (vVal < -0.5) { vBadge.className = "badge badge-danger"; vBadge.innerText = "ล่าช้ากว่าแผน"; vDays.innerText = `ล่าช้า ${absDays} วัน`; vDays.style.color = "var(--danger)"; }
+      else { vBadge.className = "badge badge-warning"; vBadge.innerText = "ตรงตามแผนงาน"; vDays.innerText = "ตามแผน"; vDays.style.color = "var(--text-muted)"; }
+
+      const tWorkers = state.dailyLogs.reduce((sum, l) => sum + (parseInt(l.workers) || 0), 0);
       document.getElementById("kpi-manpower-total").innerHTML = `${tWorkers} <span class="unit">Man-days</span>`;
       document.getElementById("kpi-manpower-avg").innerText = state.dailyLogs.length ? (tWorkers / state.dailyLogs.length).toFixed(1) : 0;
-      document.getElementById("kpi-manpower-max").innerText = state.dailyLogs.length ? Math.max(...state.dailyLogs.map(l => parseInt(l.workers)||0)) : 0;
+      document.getElementById("kpi-manpower-max").innerText = state.dailyLogs.length ? Math.max(...state.dailyLogs.map(l => parseInt(l.workers) || 0)) : 0;
       document.getElementById("tab-task-count").innerText = state.tasks.length;
       document.getElementById("gantt-item-count").innerText = `${state.tasks.length} รายการ`;
       document.getElementById("manpower-log-count").innerText = `${state.dailyLogs.length} รายการ`;
@@ -1072,80 +1215,101 @@
 
     function renderVarianceAnalysis(tl) {
       const svDesc = document.getElementById("perf-sv-desc"), spiDesc = document.getElementById("perf-spi-desc"), esDesc = document.getElementById("perf-es-desc");
-      const v = tl.variancePct, spi = tl.plannedAtStatus > 0 ? (tl.actualAtStatus / tl.plannedAtStatus).toFixed(2) : "1.00";
-      svDesc.innerHTML = v >= 0 ? `<strong style="color:var(--success);">+${v.toFixed(1)}% (เป็นบวก)</strong> โครงการส่งมอบงานได้เร็วกว่าเป้าหมายที่กำหนดไว้` : `<strong style="color:var(--danger);">${v.toFixed(1)}% (ติดลบ)</strong> โครงการมีความล่าช้ากว่าแผนสะสม จำเป็นต้องเร่งรัดงาน`;
-      spiDesc.innerHTML = parseFloat(spi) >= 1.0 ? `<strong style="color:var(--success);">SPI = ${spi}</strong> ประสิทธิภาพตารางการดำเนินงานอยู่ในเกณฑ์ดีเยี่ยม (SPI ≥ 1.0)` : `<strong style="color:var(--danger);">SPI = ${spi}</strong> ประสิทธิภาพต่ำกว่าแผนงาน (SPI &lt; 1.0) ควรพิจารณาเพิ่มทรัพยากร`;
+      const v = tl.variancePct;
+      if (v > 0.5) svDesc.innerHTML = `<strong style="color:var(--success);">+${v.toFixed(1)}% (เป็นบวก)</strong> โครงการส่งมอบงานได้เร็วกว่าเป้าหมายที่กำหนดไว้`;
+      else if (v < -0.5) svDesc.innerHTML = `<strong style="color:var(--danger);">${v.toFixed(1)}% (ติดลบ)</strong> โครงการมีความล่าช้ากว่าแผนสะสม จำเป็นต้องเร่งรัดงาน`;
+      else svDesc.innerHTML = `<strong style="color:var(--warning);">${v > 0 ? "+" : ""}${v.toFixed(1)}%</strong> ความคืบหน้าใกล้เคียงกับแผนงาน`;
+
+      if (tl.plannedAtStatus <= 0) spiDesc.innerHTML = `<strong>SPI = –</strong> ยังไม่ถึงกำหนดเริ่มงานตามแผน ณ วันประเมินผล`;
+      else {
+        const spi = tl.actualAtStatus / tl.plannedAtStatus;
+        spiDesc.innerHTML = spi >= 1.0 ? `<strong style="color:var(--success);">SPI = ${spi.toFixed(2)}</strong> ประสิทธิภาพตารางการดำเนินงานอยู่ในเกณฑ์ดี (SPI ≥ 1.0)` : `<strong style="color:var(--danger);">SPI = ${spi.toFixed(2)}</strong> ประสิทธิภาพต่ำกว่าแผนงาน (SPI &lt; 1.0) ควรพิจารณาเพิ่มทรัพยากร`;
+      }
       const diff = tl.daysVariance;
-      if (diff > 0) esDesc.innerHTML = `ผลงานปัจจุบันเทียบเท่ากับแผนล่วงหน้าไปแล้ว <strong style="color:var(--success);">+${diff} วัน</strong> (Earned Date: ${formatThaiDate(tl.earnedDate)})`;
-      else if (diff < 0) esDesc.innerHTML = `ผลงานปัจจุบันล่าช้ากว่าตารางเวลาเทียบเท่า <strong style="color:var(--danger);">${diff} วัน</strong> (Earned Date: ${formatThaiDate(tl.earnedDate)})`;
-      else esDesc.innerHTML = `ผลงานดำเนินไปสอดคล้องกับกำหนดการของแผนงานอย่างสมดุล (On Track)`;
+      let es;
+      if (diff > 0) es = `ผลงานปัจจุบันเทียบเท่ากับแผนล่วงหน้าไปแล้ว <strong style="color:var(--success);">+${diff} วัน</strong> (Earned Date: ${formatThaiDate(tl.earnedDate)})`;
+      else if (diff < 0) es = `ผลงานปัจจุบันล่าช้ากว่าตารางเวลาเทียบเท่า <strong style="color:var(--danger);">${diff} วัน</strong> (Earned Date: ${formatThaiDate(tl.earnedDate)})`;
+      else es = `ผลงานดำเนินไปสอดคล้องกับกำหนดการของแผนงาน (On Track)`;
+      if (tl.forecastEnd) {
+        const late = diffDays(tl.pEnd, tl.forecastEnd);
+        es += `<div style="margin-top:6px; font-size:0.82rem; color:var(--text-muted);">คาดการณ์แล้วเสร็จ 100%: <strong style="color:${late > 0 ? "var(--danger)" : "var(--success)"};">${formatThaiDate(tl.forecastEnd)}</strong> ${late > 0 ? `(ช้ากว่าแผน ${late} วัน)` : late < 0 ? `(เร็วกว่าแผน ${-late} วัน)` : "(ตรงตามแผน)"}</div>`;
+      }
+      esDesc.innerHTML = es;
     }
 
     /* =========================================================
-       GANTT CHART & TASKS RENDER
+       GANTT CHART
        ========================================================= */
+    function categoryOptionsHtml(selected, allLabel) {
+      return `<option value="ALL">${allLabel}</option>` + getTaskCategories().map(c => `<option value="${escapeHtml(c)}" ${c === selected ? "selected" : ""}>${escapeHtml(c)}</option>`).join("");
+    }
     function renderGantt() {
       const thead = document.getElementById("gantt-thead"), tbody = document.getElementById("gantt-tbody");
       if (!thead || !tbody) return;
-      const tl = calculateProjectTimeline(), catFilter = document.getElementById("gantt-category-filter").value;
-      let filtered = state.tasks; if (catFilter !== "ALL") filtered = filtered.filter(t => t.category === catFilter);
-      
-      const catSelect = document.getElementById("gantt-category-filter");
-      catSelect.innerHTML = `<option value="ALL">ทุกหมวดหมู่งาน</option>` + [...new Set([...state.categories, ...state.tasks.map(t=>t.category)])].filter(Boolean).map(c => `<option value="${c}" ${c===catSelect.value?'selected':''}>${c}</option>`).join("");
-      const statusOffset = diffDays(tl.pStart, tl.statusDate);
-      const hasStatusMarker = statusOffset >= 0 && statusOffset < tl.dates.length;
-      const statusLine = hasStatusMarker ? `<span class="gantt-status-line" style="left:${statusOffset * 28 + 13}px;"></span>` : "";
+      const tl = getTimeline(), catSelect = document.getElementById("gantt-category-filter");
+      let catFilter = catSelect.value;
+      if (catFilter !== "ALL" && !getTaskCategories().includes(catFilter)) catFilter = "ALL";
+      catSelect.innerHTML = categoryOptionsHtml(catFilter, "ทุกหมวดหมู่งาน");
+      catSelect.value = catFilter;
+      const filtered = catFilter === "ALL" ? state.tasks : state.tasks.filter(t => t.category === catFilter);
 
-      let headMonths = "", headD = "";
-      let monthStart = 0;
-      const monthLabel = d => new Intl.DateTimeFormat("th-TH", { month: "long", year: "numeric" }).format(d);
+      const statusLine = (tl.statusIdx >= 0 && tl.statusIdx < tl.dates.length) ? `<span class="gantt-status-line" style="left:${tl.statusIdx * DAY_PX + 13}px;"></span>` : "";
+
+      let headMonths = "", headD = "", monthStart = 0;
       for (let i = 1; i <= tl.dates.length; i++) {
-        const currentMonth = i < tl.dates.length ? `${tl.dates[i].getFullYear()}-${tl.dates[i].getMonth()}` : null;
-        const startMonth = `${tl.dates[monthStart].getFullYear()}-${tl.dates[monthStart].getMonth()}`;
-        if (currentMonth !== startMonth) {
-          headMonths += `<div style="grid-column:span ${i - monthStart};">${monthLabel(tl.dates[monthStart])}</div>`;
+        const ms = tl.dates[monthStart];
+        if (i === tl.dates.length || tl.dates[i].getMonth() !== ms.getMonth() || tl.dates[i].getFullYear() !== ms.getFullYear()) {
+          headMonths += `<div style="grid-column:span ${i - monthStart}; overflow:hidden; text-overflow:ellipsis;">${MONTHS_TH_LONG[ms.getMonth()]} ${ms.getFullYear() + 543}</div>`;
           monthStart = i;
         }
       }
-      tl.dates.forEach(d => {
-        const isStat = formatDate(d) === state.project.statusDate;
-        headD += `<div style="font-size:0.72rem; ${isStat?'background:#fee2e2;color:#ef4444;font-weight:700;':''}"><div>${d.getDate()}</div><div style="font-size:0.65rem; color:var(--text-muted);">${["อา","จ","อ","พ","พฤ","ศ","ส"][d.getDay()]}</div></div>`;
+      tl.dates.forEach((d, idx) => {
+        const isStat = idx === tl.statusIdx, isWeekend = d.getDay() === 0 || d.getDay() === 6;
+        headD += `<div style="font-size:0.72rem; ${isStat ? "background:#fee2e2;color:#ef4444;font-weight:700;" : isWeekend ? "background:rgba(148,163,184,0.12);" : ""}"><div>${d.getDate()}</div><div style="font-size:0.65rem; color:var(--text-muted);">${DAYS_TH[d.getDay()]}</div></div>`;
       });
-      const dayTrackStyle = `grid-template-columns:repeat(${tl.dates.length},28px);width:${tl.dates.length * 28}px;`;
-      thead.innerHTML = `<tr class="gantt-header-row"><th class="gantt-task-col">รายการงาน (Task Name)</th><th colspan="${tl.dates.length}" style="padding:0; background:var(--bg-subtle);"><div style="text-align:center; padding:6px 8px; border-bottom:1px solid var(--border-color);">ไทม์ไลน์รายวัน (${formatThaiDate(tl.pStart)} - ${formatThaiDate(tl.pEnd)})</div><div class="gantt-header-track months" style="${dayTrackStyle}">${headMonths}</div><div class="gantt-header-track" style="${dayTrackStyle}">${headD}</div></th></tr>`;
-      
-      if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="${tl.dates.length+1}" style="text-align:center; padding:40px; color:var(--text-muted);">ไม่มีข้อมูล</td></tr>`; return; }
+      const dayTrackStyle = `grid-template-columns:repeat(${tl.dates.length},${DAY_PX}px);width:${tl.dates.length * DAY_PX}px;`;
+      thead.innerHTML = `<tr class="gantt-header-row"><th class="gantt-task-col">รายการงาน (Task Name)</th><th style="padding:0; background:var(--bg-subtle);"><div style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border-color);"><span style="position:sticky; left:330px; display:inline-block;">ไทม์ไลน์รายวัน (${formatThaiDate(tl.pStart)} - ${formatThaiDate(tl.chartEnd)})</span></div><div class="gantt-header-track months" style="${dayTrackStyle}">${headMonths}</div><div class="gantt-header-track" style="${dayTrackStyle}">${headD}</div></th></tr>`;
 
-      let html = "", curCat = "";
-      filtered.forEach(task => {
-        if (task.category !== curCat) {
-          curCat = task.category;
-          const categoryValue = state.tasks.filter(item => item.category === curCat).reduce((sum, item) => sum + getTaskValue(item), 0);
-          html += `<tr class="category-row"><td class="gantt-task-col"><div style="display:flex; align-items:center; justify-content:space-between; gap:8px;"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📁 ${curCat}</span><span class="badge badge-info" style="white-space:nowrap; flex-shrink:0;">${formatBaht(categoryValue)}</span></div></td><td colspan="${tl.dates.length}" class="gantt-status-cell" style="background:var(--bg-subtle);">${statusLine}</td></tr>`;
-        }
-        const ps = parseDate(task.plannedStart) || tl.pStart, pe = parseDate(task.plannedEnd) || tl.pEnd;
-        const bLeft = Math.max(0, diffDays(tl.pStart, ps)) * 28, bWidth = Math.max(1, diffDays(ps, pe) + 1) * 28;
-        const prog = parseFloat(task.progress) || 0, aWidth = (prog / 100) * bWidth;
+      if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:40px; color:var(--text-muted);">ไม่มีข้อมูล</td></tr>`; return; }
 
-        html += `<tr>
-          <td class="gantt-task-col" title="${task.name}" onclick="openTaskModal('${task.id}')" style="cursor:pointer;">
-            <div style="font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">${task.name}</div>
-            <div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:2px;">
-              <span>${task.assignedTo || '-'}</span><span>${task.duration} วัน • <strong style="color:${prog===100?'var(--success)':'var(--primary)'};">${prog}%</strong></span>
-            </div>
-          </td>
-          <td colspan="${tl.dates.length}" class="gantt-timeline-cell gantt-status-cell">
-            ${statusLine}
-            <div class="gantt-bar-container">
-              <div class="gantt-planned-bar" style="left:${bLeft}px; width:${bWidth}px;"></div>
-              ${prog > 0 ? `<div class="gantt-actual-bar" style="left:${bLeft}px; width:${aWidth}px;"></div>` : ''}
-            </div>
-          </td>
-        </tr>`;
+      // Group by category in order of first appearance (avoids repeated headers after drag-reorder).
+      const groups = new Map();
+      filtered.forEach(t => { if (!groups.has(t.category)) groups.set(t.category, []); groups.get(t.category).push(t); });
+
+      let html = "";
+      groups.forEach((tasks, cat) => {
+        const categoryValue = state.tasks.filter(item => item.category === cat).reduce((sum, item) => sum + getTaskValue(item), 0);
+        html += `<tr class="category-row"><td class="gantt-task-col"><div style="display:flex; align-items:center; justify-content:space-between; gap:8px;"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📁 ${escapeHtml(cat)} <span style="font-weight:400; color:var(--text-muted);">(${tasks.length})</span></span>${categoryValue > 0 ? `<span class="badge badge-info" style="white-space:nowrap; flex-shrink:0;">${formatBaht(categoryValue)}</span>` : ""}</div></td><td class="gantt-status-cell" style="background:var(--bg-subtle);">${statusLine}</td></tr>`;
+        tasks.forEach(task => {
+          const ps = parseDate(task.plannedStart) || tl.pStart, pe = parseDate(task.plannedEnd) || ps;
+          const bLeft = Math.max(0, diffDays(tl.pStart, ps)) * DAY_PX, bWidth = Math.max(1, diffDays(ps, pe) + 1) * DAY_PX;
+          const prog = clampPct(task.progress), aWidth = (prog / 100) * bWidth;
+          const tip = `${task.name}\nแผน: ${formatThaiDate(task.plannedStart)} - ${formatThaiDate(task.plannedEnd)}\nจริง: ${task.actualStart ? formatThaiDate(task.actualStart) : "-"}${task.actualEnd ? " - " + formatThaiDate(task.actualEnd) : ""}\nความคืบหน้า: ${prog}%`;
+          html += `<tr>
+            <td class="gantt-task-col" title="${escapeHtml(task.name)}" onclick="openTaskModal(${jsArg(task.id)})" style="cursor:pointer;">
+              <div style="font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">${escapeHtml(task.name)}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:2px;">
+                <span>${escapeHtml(task.assignedTo || "-")}</span><span>${task.duration} วัน • <strong style="color:${prog === 100 ? "var(--success)" : "var(--primary)"};">${prog}%</strong></span>
+              </div>
+            </td>
+            <td class="gantt-timeline-cell gantt-status-cell">
+              ${statusLine}
+              <div class="gantt-bar-container" title="${escapeHtml(tip)}">
+                <div class="gantt-planned-bar" style="left:${bLeft}px; width:${bWidth}px;"></div>
+                ${prog > 0 ? `<div class="gantt-actual-bar" style="left:${bLeft}px; width:${aWidth}px;"></div>` : ""}
+              </div>
+            </td>
+          </tr>`;
+        });
       });
       tbody.innerHTML = html;
     }
-    function scrollGanttToToday() { const cont = document.getElementById("gantt-scroll-container"), tl = calculateProjectTimeline(), off = diffDays(tl.pStart, tl.statusDate); if (cont && off > 0) cont.scrollTo({ left: off * 28 - 150, behavior: "smooth" }); }
+    function scrollGanttToToday(smooth) {
+      const cont = document.getElementById("gantt-scroll-container"), tl = getTimeline();
+      if (!cont) return;
+      const frozen = (cont.querySelector(".gantt-task-col") || {}).offsetWidth || 320;
+      cont.scrollTo({ left: Math.max(0, tl.statusIdx * DAY_PX + 14 - (cont.clientWidth - frozen) / 2), behavior: smooth === false ? "auto" : "smooth" });
+    }
 
     function toggleGanttExpanded(force) {
       const wrapper = document.querySelector("#tab-gantt .gantt-wrapper"), button = document.getElementById("gantt-expand-btn");
@@ -1157,6 +1321,13 @@
       button.innerHTML = expanded ? "⛶ ย่อกลับ" : "⛶ ขยาย";
     }
 
+    /* =========================================================
+       TASK TABLE
+       ========================================================= */
+    function isTaskDelayed(t) {
+      const pend = parseDate(t.plannedEnd), statusD = parseDate(state.project.statusDate);
+      return clampPct(t.progress) < 100 && pend && statusD && pend < statusD;
+    }
     function getTaskStatusBadgeHtml(prog, plannedEndStr) {
       const pend = parseDate(plannedEndStr), statusD = parseDate(state.project.statusDate);
       if (prog >= 100) return `<span class="badge badge-success">เสร็จสมบูรณ์</span>`;
@@ -1164,100 +1335,72 @@
       else if (prog > 0) return `<span class="badge badge-info">กำลังดำเนินงาน</span>`;
       else return `<span class="badge badge-neutral">ยังไม่เริ่ม</span>`;
     }
+    function actualDateText(t) { return `${t.actualStart ? formatThaiDate(t.actualStart, true) : "-"}${t.actualEnd ? " ถึง " + formatThaiDate(t.actualEnd, true) : ""}`; }
 
     function renderTasks() {
       const tbody = document.getElementById("task-tbody"); if (!tbody) return;
-      const search = state.taskFilters.search.toLowerCase(), cat = state.taskFilters.category, stat = state.taskFilters.status;
-      
-      let list = state.tasks.filter(t => {
-        if (search && !t.name.toLowerCase().includes(search) && !(t.assignedTo||'').toLowerCase().includes(search)) return false;
+      const search = state.taskFilters.search.toLowerCase().trim(), stat = state.taskFilters.status;
+      if (state.taskFilters.category !== "ALL" && !getTaskCategories().includes(state.taskFilters.category)) state.taskFilters.category = "ALL";
+      const cat = state.taskFilters.category;
+      document.getElementById("task-category-filter").innerHTML = categoryOptionsHtml(cat, "ทุกหมวดหมู่งาน (All Categories)");
+
+      const list = state.tasks.filter(t => {
+        const prog = clampPct(t.progress);
+        if (search && !t.name.toLowerCase().includes(search) && !(t.assignedTo || "").toLowerCase().includes(search) && !(t.notes || "").toLowerCase().includes(search)) return false;
         if (cat !== "ALL" && t.category !== cat) return false;
-        if (stat === "completed" && t.progress < 100) return false;
-        if (stat === "in_progress" && (t.progress <= 0 || t.progress >= 100)) return false;
-        if (stat === "not_started" && t.progress > 0) return false;
-        if (stat === "delayed" && !(parseDate(t.plannedEnd) < parseDate(state.project.statusDate) && t.progress < 100)) return false;
+        if (stat === "completed" && prog < 100) return false;
+        if (stat === "in_progress" && (prog <= 0 || prog >= 100)) return false;
+        if (stat === "not_started" && prog > 0) return false;
+        if (stat === "delayed" && !isTaskDelayed(t)) return false;
         return true;
       });
 
-      const catSelect = document.getElementById("task-category-filter");
-      catSelect.innerHTML = `<option value="ALL">ทุกหมวดหมู่งาน</option>` + [...new Set([...state.categories, ...state.tasks.map(t=>t.category)])].filter(Boolean).map(c => `<option value="${c}" ${c===catSelect.value?'selected':''}>${c}</option>`).join("");
-
       if (state.tasks.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:45px 20px;"><div style="font-size:2.2rem; margin-bottom:10px;">📋</div><div style="font-weight:600; font-size:1.1rem; margin-bottom:6px;">ยังไม่มีรายการงานในโครงการ</div></td></tr>`; updateBatchDelBtn(); return;
+        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:45px 20px;"><div style="font-size:2.2rem; margin-bottom:10px;">📋</div><div style="font-weight:600; font-size:1.1rem; margin-bottom:6px;">ยังไม่มีรายการงานในโครงการ</div><button class="btn btn-primary btn-sm" onclick="openTaskModal(null)">เพิ่มงานแรก</button></td></tr>`; updateBatchDelBtn(); return;
       }
-      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการงาน</td></tr>`; updateBatchDelBtn(); return; }
+      if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการงานตามตัวกรอง</td></tr>`; updateBatchDelBtn(); return; }
 
+      const isFiltered = search || cat !== "ALL" || stat !== "ALL";
       let html = "";
       list.forEach((t, i) => {
-        const prog = parseFloat(t.progress) || 0;
-        
-        // Render Row elements with truncation support
-        html += `<tr id="task-row-${t.id}" class="task-row-item" 
-              ondragstart="dragStart(event, '${t.id}')" 
-              ondragover="dragOver(event)" 
-              ondragleave="dragLeave(event)" 
-              ondrop="drop(event, '${t.id}')" 
-              ondragend="dragEnd(event)">
-            
-            <td class="drag-handle" title="คลิกค้างแล้วลากเพื่อย้ายลำดับ"
+        const prog = clampPct(t.progress), id = jsArg(t.id);
+        const planText = `${formatThaiDate(t.plannedStart, true)} - ${formatThaiDate(t.plannedEnd, true)}`;
+        html += `<tr id="task-row-${escapeHtml(t.id)}" class="task-row-item" draggable="false"
+              ondragstart="dragStart(event, ${id})" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="drop(event, ${id})" ondragend="dragEnd(event)">
+            <td class="drag-handle" title="${isFiltered ? "ล้างตัวกรองก่อนเพื่อย้ายลำดับได้แม่นยำ" : "คลิกค้างแล้วลากเพื่อย้ายลำดับ"}"
                 onmousedown="this.parentNode.setAttribute('draggable', 'true')"
-                onmouseup="this.parentNode.setAttribute('draggable', 'false')"
-                onmouseleave="this.parentNode.setAttribute('draggable', 'false')">⋮⋮</td>
-            
-            <td style="text-align:center;"><input type="checkbox" class="task-checkbox" value="${t.id}" onchange="updateBatchDelBtn()"></td>
+                onmouseup="this.parentNode.setAttribute('draggable', 'false')">⋮⋮</td>
+            <td style="text-align:center;"><input type="checkbox" class="task-checkbox" value="${escapeHtml(t.id)}" onchange="updateBatchDelBtn()"></td>
             <td style="text-align:center; color:var(--text-muted); font-size:0.75rem;">${i + 1}</td>
-            
-            <!-- หมวดหมู่ -->
-            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${t.category}">
-              <span class="badge badge-neutral" style="font-size:0.75rem;">${t.category}</span>
+            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(t.category)}"><span class="badge badge-neutral" style="font-size:0.75rem;">${escapeHtml(t.category)}</span></td>
+            <td style="overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(t.name)}">
+              <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><strong style="cursor:pointer;" onclick="openTaskModal(${id})">${escapeHtml(t.name)}</strong></div>
+              ${t.notes ? `<div style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(t.notes)}">📝 ${escapeHtml(t.notes)}</div>` : ""}
             </td>
-            
-            <!-- รายการงาน -->
-            <td style="overflow:hidden; text-overflow:ellipsis;" title="${t.name}">
-              <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                <strong style="cursor:pointer;" onclick="openTaskModal('${t.id}')">${t.name}</strong>
-              </div>
-              ${t.notes?`<div style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${t.notes}">📝 ${t.notes}</div>`:''}
-            </td>
-            
-            <!-- ผู้รับผิดชอบ -->
-            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text-muted);" title="${t.assignedTo || '-'}">
-              ${t.assignedTo || '-'}
-            </td>
-            
-            <!-- แผน: เริ่ม - จบ -->
-            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.8rem;" title="${formatThaiDate(t.plannedStart, true)} - ${formatThaiDate(t.plannedEnd, true)}">
-              ${formatThaiDate(t.plannedStart, true)} - ${formatThaiDate(t.plannedEnd, true)}
-            </td>
-            
+            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text-muted);" title="${escapeHtml(t.assignedTo || "-")}">${escapeHtml(t.assignedTo || "-")}</td>
+            <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.8rem;" title="${planText}">${planText}</td>
             <td style="text-align:center; font-weight:600;">${t.duration} วัน</td>
-            
-            <!-- ทำจริง: เริ่ม - จบ -->
-            <td id="act-date-${t.id}" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.8rem; color:var(--text-muted);" title="${t.actualStart?formatThaiDate(t.actualStart,true):'-'} ${t.actualEnd?'ถึง '+formatThaiDate(t.actualEnd,true):''}">
-              ${t.actualStart?formatThaiDate(t.actualStart,true):'-'} ${t.actualEnd?'ถึง '+formatThaiDate(t.actualEnd,true):''}
-            </td>
-            
+            <td id="act-date-${escapeHtml(t.id)}" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.8rem; color:var(--text-muted);" title="${actualDateText(t)}">${actualDateText(t)}</td>
             <td>
               <div class="progress-slider-cell">
-                <input type="range" class="progress-slider" min="0" max="100" value="${prog}" oninput="handleProgressInput('${t.id}', this.value)" onchange="handleProgressChange('${t.id}', this.value)">
-                <span class="progress-pct-badge" id="prog-bdg-${t.id}" style="color:${prog===100?'var(--success)':'var(--primary)'};">${prog}%</span>
+                <input type="range" class="progress-slider" min="0" max="100" value="${prog}" oninput="handleProgressInput(${id}, this.value)" onchange="handleProgressChange(${id}, this.value)">
+                <span class="progress-pct-badge" id="prog-bdg-${escapeHtml(t.id)}" style="color:${prog === 100 ? "var(--success)" : "var(--primary)"};">${prog}%</span>
               </div>
             </td>
-            <td style="text-align:right; font-weight:600;">${t.weight}%</td>
-            <td id="task-value-${t.id}" style="text-align:right; white-space:nowrap;">${getTaskValue(t) > 0 ? `<strong style="color:var(--success);">${formatBaht(getTaskValue(t) * prog / 100)}</strong><div style="font-size:.72rem;color:var(--text-muted);">จาก ${formatBaht(getTaskValue(t))}</div>` : `<span style="color:var(--text-muted);">กรอกมูลค่างาน</span>`}</td>
-            <td id="stat-cell-${t.id}" style="text-align:center;">${getTaskStatusBadgeHtml(prog, t.plannedEnd)}</td>
+            <td style="text-align:right; font-weight:600;">${(Number(t.weight) || 0).toFixed(2)}%</td>
+            <td id="task-value-${escapeHtml(t.id)}" style="text-align:right; white-space:nowrap;">${taskValueCellHtml(t)}</td>
+            <td id="stat-cell-${escapeHtml(t.id)}" style="text-align:center;">${getTaskStatusBadgeHtml(prog, t.plannedEnd)}</td>
             <td style="text-align:center;">
               <div style="display:flex; justify-content:center; gap:4px;">
-                <button class="btn-icon btn-sm" onclick="openTaskModal('${t.id}')" title="แก้ไข">✏️</button>
-                <button class="btn-icon btn-sm" onclick="deleteTask('${t.id}')" title="ลบ" style="color:var(--danger);">🗑️</button>
+                <button class="btn-icon btn-sm" onclick="openTaskModal(${id})" title="แก้ไข">✏️</button>
+                <button class="btn-icon btn-sm" onclick="deleteTask(${id})" title="ลบ" style="color:var(--danger);">🗑️</button>
               </div>
             </td>
           </tr>`;
       });
       tbody.innerHTML = html;
       updateBatchDelBtn();
-      
-      setTimeout(initResizableColumns, 50);
+      initResizableColumns();
     }
 
     function filterTasks() {
@@ -1266,11 +1409,13 @@
       state.taskFilters.status = document.getElementById("task-status-filter").value;
       renderTasks();
     }
+
+    /* =========================================================
+       CATEGORY MANAGER
+       ========================================================= */
     function getTaskCategories() {
-      return [...new Set([
-        ...state.categories,
-        ...state.tasks.map(task => task.category)
-      ].map(category => (category || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "th"));
+      return [...new Set([...state.categories, ...state.tasks.map(task => task.category)]
+        .map(category => (category || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "th"));
     }
     function openCategoryManager() {
       renderCategoryManagerList();
@@ -1289,121 +1434,115 @@
         list.appendChild(empty);
         return;
       }
-
       categories.forEach(category => {
+        const count = state.tasks.filter(t => t.category === category).length;
         const row = document.createElement("div");
         row.style.cssText = "display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid var(--border-color); border-radius:var(--radius-sm); background:var(--bg-card);";
         const label = document.createElement("span");
-        label.textContent = category;
+        label.textContent = `${category} (${count} งาน)`;
         label.style.cssText = "font-weight:500; overflow-wrap:anywhere;";
         const actions = document.createElement("div");
         actions.style.cssText = "display:flex; gap:6px; flex-shrink:0;";
         const renameButton = document.createElement("button");
-        renameButton.type = "button";
-        renameButton.className = "btn btn-secondary btn-sm";
-        renameButton.textContent = "แก้ไขชื่อ";
+        renameButton.type = "button"; renameButton.className = "btn btn-secondary btn-sm"; renameButton.textContent = "แก้ไขชื่อ";
         renameButton.addEventListener("click", () => renameManagedCategory(category));
         const deleteButton = document.createElement("button");
-        deleteButton.type = "button";
-        deleteButton.className = "btn btn-outline-danger btn-sm";
-        deleteButton.textContent = "ลบ";
+        deleteButton.type = "button"; deleteButton.className = "btn btn-outline-danger btn-sm"; deleteButton.textContent = "ลบ";
         deleteButton.addEventListener("click", () => deleteManagedCategory(category));
         actions.append(renameButton, deleteButton);
         row.append(label, actions);
         list.appendChild(row);
       });
     }
+    function afterCategoryChange(msg) { saveState(); renderCategoryManagerList(); renderTasks(); refreshViews(); showToast(msg); }
     function addManagedCategory() {
       const input = document.getElementById("new-category-name");
       const name = input.value.trim();
       if (!name) { showToast("กรุณาพิมพ์ชื่อหมวดหมู่ใหม่"); input.focus(); return; }
-      if (getTaskCategories().some(category => category.toLowerCase() === name.toLowerCase())) { showToast("มีหมวดหมู่นี้อยู่แล้ว"); return; }
+      if (getTaskCategories().some(c => c.toLowerCase() === name.toLowerCase())) { showToast("มีหมวดหมู่นี้อยู่แล้ว"); return; }
       state.categories.push(name);
-      saveState();
-      renderCategoryManagerList();
-      renderTasks(); renderGantt();
-      input.value = "";
-      input.focus();
-      showToast(`เพิ่มหมวดหมู่ "${name}" แล้ว`);
+      input.value = ""; input.focus();
+      afterCategoryChange(`เพิ่มหมวดหมู่ "${name}" แล้ว`);
     }
     function renameManagedCategory(oldName) {
       const newNameInput = prompt(`ระบุชื่อใหม่สำหรับหมวดหมู่ "${oldName}":`, oldName);
       if (newNameInput === null) return;
       const newName = newNameInput.trim();
       if (!newName) { showToast("ชื่อหมวดหมู่ห้ามเว้นว่าง"); return; }
-      if (newName.toLowerCase() !== oldName.toLowerCase() && getTaskCategories().some(category => category.toLowerCase() === newName.toLowerCase())) { showToast("มีหมวดหมู่นี้อยู่แล้ว"); return; }
-      state.categories = [...new Set([...state.categories.map(category => category === oldName ? newName : category), newName])];
+      if (newName === oldName) return;
+      if (newName.toLowerCase() !== oldName.toLowerCase() && getTaskCategories().some(c => c.toLowerCase() === newName.toLowerCase())) { showToast("มีหมวดหมู่นี้อยู่แล้ว"); return; }
+      state.categories = [...new Set([...state.categories.filter(c => c !== oldName), newName])];
       state.tasks.forEach(task => { if (task.category === oldName) task.category = newName; });
       if (state.taskFilters.category === oldName) state.taskFilters.category = newName;
-      saveState();
-      renderCategoryManagerList();
-      renderTasks(); renderGantt();
-      showToast(`เปลี่ยนชื่อหมวดหมู่เป็น "${newName}" แล้ว`);
+      afterCategoryChange(`เปลี่ยนชื่อหมวดหมู่เป็น "${newName}" แล้ว`);
     }
     function deleteManagedCategory(categoryToDelete) {
-      const remaining = getTaskCategories().filter(category => category !== categoryToDelete);
-      const fallbackCategory = remaining.includes("General") ? "General" : (remaining[0] || "General");
       const taskCount = state.tasks.filter(task => task.category === categoryToDelete).length;
-      const detail = taskCount ? ` งาน ${taskCount} รายการในหมวดนี้จะย้ายไป "${fallbackCategory}"` : "";
+      const remaining = getTaskCategories().filter(c => c !== categoryToDelete);
+      if (taskCount && !remaining.length) { alert("ไม่สามารถลบหมวดหมู่สุดท้ายที่ยังมีงานอยู่ได้ กรุณาสร้างหมวดหมู่อื่นก่อน หรือใช้ 'แก้ไขชื่อ' แทน"); return; }
+      const fallbackCategory = remaining.includes("General") ? "General" : remaining[0];
+      const detail = taskCount ? `\nงาน ${taskCount} รายการในหมวดนี้จะย้ายไป "${fallbackCategory}"` : "";
       if (!confirm(`ยืนยันลบหมวดหมู่ "${categoryToDelete}"?${detail}`)) return;
-      state.categories = state.categories.filter(category => category !== categoryToDelete);
+      state.categories = state.categories.filter(c => c !== categoryToDelete);
       state.tasks.forEach(task => { if (task.category === categoryToDelete) task.category = fallbackCategory; });
-      if (taskCount && !state.categories.includes(fallbackCategory)) state.categories.push(fallbackCategory);
       if (state.taskFilters.category === categoryToDelete) state.taskFilters.category = "ALL";
-      saveState();
-      renderCategoryManagerList();
-      renderTasks(); renderGantt();
-      showToast(`ลบหมวดหมู่ "${categoryToDelete}" แล้ว`);
+      afterCategoryChange(`ลบหมวดหมู่ "${categoryToDelete}" แล้ว`);
     }
 
+    /* =========================================================
+       PROGRESS SLIDER / WEIGHTS
+       ========================================================= */
     function handleProgressInput(id, val) {
-      const badge = document.getElementById(`prog-bdg-${id}`), cell = document.getElementById(`stat-cell-${id}`), task = state.tasks.find(t=>t.id===id);
+      const badge = document.getElementById(`prog-bdg-${id}`), cell = document.getElementById(`stat-cell-${id}`), task = state.tasks.find(t => t.id === id);
       if (badge) { badge.innerText = `${val}%`; badge.style.color = val == 100 ? "var(--success)" : "var(--primary)"; }
       if (cell && task) cell.innerHTML = getTaskStatusBadgeHtml(parseFloat(val), task.plannedEnd);
       if (task) updateTaskValueCell(task, val);
     }
     function handleProgressChange(id, val) {
-      const task = state.tasks.find(t=>t.id===id); if (!task) return;
-      task.progress = parseFloat(val);
-      if (task.progress >= 100 && !task.actualEnd) task.actualEnd = state.project.statusDate || formatDate(new Date());
+      const task = state.tasks.find(t => t.id === id); if (!task) return;
+      task.progress = clampPct(val);
       if (task.progress > 0 && !task.actualStart) task.actualStart = task.plannedStart;
-      saveState(); const actC = document.getElementById(`act-date-${id}`);
-      if (actC) actC.innerText = `${task.actualStart?formatThaiDate(task.actualStart,true):'-'} ${task.actualEnd?'ถึง '+formatThaiDate(task.actualEnd,true):''}`;
-      const tl = calculateProjectTimeline(); updateKPICards(tl);
-      if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
+      if (task.progress >= 100 && !task.actualEnd) task.actualEnd = state.project.statusDate || formatDate(today());
+      if (task.progress < 100 && task.actualEnd) task.actualEnd = "";   // not finished any more
+      saveState();
+      const actC = document.getElementById(`act-date-${id}`);
+      if (actC) { actC.innerText = actualDateText(task); actC.title = actualDateText(task); }
+      refreshViews();
       showToast(`อัปเดตความคืบหน้าเป็น ${task.progress}% เรียบร้อย`);
     }
     function autoCalculateWeights() {
-      state.project.weightMode = "duration"; normalizeWeights(); saveState(); renderTasks();
-      const tl = calculateProjectTimeline(); updateKPICards(tl);
-      if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
+      if (!state.tasks.length) return;
+      if (!confirm("เติมค่าน้ำหนักทุกงานตามสัดส่วนระยะเวลา? (ค่าน้ำหนักที่กรอกไว้เองจะถูกแทนที่)")) return;
+      const w = durationWeights();
+      state.tasks.forEach((t, i) => { t.weight = w[i]; });
+      saveState(); renderTasks(); refreshViews();
       showToast("คำนวณค่าน้ำหนักงานสำเร็จ");
     }
 
-    /* TASKS DELETION */
+    /* =========================================================
+       TASK DELETION
+       ========================================================= */
     function deleteTask(id) {
-      if (confirm(`ยืนยันการลบรายการงานใช่หรือไม่?`)) {
-        state.tasks = state.tasks.filter(t => t.id !== id); normalizeWeights(); saveState(); renderTasks();
-        const tl = calculateProjectTimeline(); updateKPICards(tl);
-        if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
-        showToast("ลบรายการสำเร็จ");
-      }
+      const task = state.tasks.find(t => t.id === id); if (!task) return false;
+      if (!confirm(`ยืนยันการลบงาน "${task.name}" ใช่หรือไม่?`)) return false;
+      state.tasks = state.tasks.filter(t => t.id !== id);
+      saveState(); renderTasks(); refreshViews();
+      showToast("ลบรายการสำเร็จ");
+      return true;
     }
-    function deleteTaskFromModal() { const id = document.getElementById("modal-task-id").value; if (id) { deleteTask(id); closeTaskModal(); } }
+    function deleteTaskFromModal() { const id = document.getElementById("modal-task-id").value; if (id && deleteTask(id)) closeTaskModal(); }
     function clearAllTasks() {
-      if (confirm(`⚠️ ยืนยันการลบรายการงานทั้งหมด?`)) {
-        state.tasks = []; saveState(); renderTasks();
-        const tl = calculateProjectTimeline(); updateKPICards(tl);
-        if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
+      if (!state.tasks.length) { showToast("ไม่มีรายการงานให้ลบ"); return; }
+      if (confirm(`⚠️ ยืนยันการลบรายการงานทั้งหมด ${state.tasks.length} รายการ?\nแนะนำให้ส่งออก JSON สำรองไว้ก่อน`)) {
+        state.tasks = []; saveState(); renderTasks(); refreshViews();
         showToast("ล้างรายการงานทั้งหมดเรียบร้อย");
       }
     }
     function deleteSelectedTasks() {
       const ids = Array.from(document.querySelectorAll(".task-checkbox:checked")).map(cb => cb.value);
       if (ids.length && confirm(`ต้องการลบงานที่เลือก ${ids.length} รายการ?`)) {
-        state.tasks = state.tasks.filter(t => !ids.includes(t.id)); normalizeWeights(); saveState(); renderTasks();
-        const tl = calculateProjectTimeline(); updateKPICards(tl);
-        if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
+        state.tasks = state.tasks.filter(t => !ids.includes(t.id));
+        saveState(); renderTasks(); refreshViews();
         showToast("ลบรายการที่เลือกสำเร็จ");
       }
     }
@@ -1423,155 +1562,376 @@
       const hasSelection = selectedCount > 0;
       const selectAllButton = document.getElementById("btn-select-all-tasks");
       const deleteSelectedButton = document.getElementById("btn-batch-delete");
-      const deleteAllButton = document.getElementById("btn-clear-all-tasks");
       const autoWeightsButton = document.getElementById("btn-auto-calculate-weights");
-      const selectedCountLabel = document.getElementById("batch-delete-count");
       const selectAllCheckbox = document.getElementById("th-select-all");
-
-      if (selectedCountLabel) selectedCountLabel.textContent = selectedCount;
-      if (selectAllButton) {
-        selectAllButton.style.display = hasSelection ? "inline-flex" : "none";
-        selectAllButton.textContent = totalCount > 0 && selectedCount === totalCount ? "ยกเลิกเลือกทั้งหมด" : "เลือกทั้งหมด";
-      }
-      if (deleteSelectedButton) deleteSelectedButton.style.display = hasSelection ? "inline-flex" : "none";
-      if (deleteAllButton) deleteAllButton.style.display = hasSelection ? "inline-flex" : "none";
-      if (autoWeightsButton) autoWeightsButton.style.display = hasSelection ? "inline-flex" : "none";
-      if (selectAllCheckbox) selectAllCheckbox.checked = totalCount > 0 && selectedCount === totalCount;
+      document.getElementById("batch-delete-count").textContent = selectedCount;
+      selectAllButton.style.display = hasSelection ? "inline-flex" : "none";
+      selectAllButton.textContent = totalCount > 0 && selectedCount === totalCount ? "ยกเลิกเลือกทั้งหมด" : "เลือกทั้งหมด";
+      deleteSelectedButton.style.display = hasSelection ? "inline-flex" : "none";
+      // only meaningful in manual mode — duration mode recalculates on every save
+      autoWeightsButton.style.display = state.project.weightMode === "manual" && state.tasks.length ? "inline-flex" : "none";
+      selectAllCheckbox.checked = totalCount > 0 && selectedCount === totalCount;
+      selectAllCheckbox.indeterminate = hasSelection && selectedCount < totalCount;
     }
 
-    /* MANPOWER */
+    /* =========================================================
+       DAILY LOGS (MANPOWER)
+       ========================================================= */
     function renderDailyLogs() {
       const tbody = document.getElementById("manpower-tbody"); if (!tbody) return;
-      const logs = [...state.dailyLogs].sort((a,b) => (a.date < b.date ? 1 : -1));
+      const logs = [...state.dailyLogs].sort((a, b) => (a.date < b.date ? 1 : -1));
       if (logs.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่มีรายการบันทึก</td></tr>`; return; }
-      let html = "";
-      logs.forEach(l => {
-        html += `<tr><td><strong>${formatThaiDate(l.date)}</strong></td><td style="text-align:center;"><span class="badge badge-info">${l.workers} คน</span></td><td>${l.activity || '-'}</td><td style="color:var(--text-muted);">${l.notes || '-'}</td><td style="text-align:center;"><button class="btn-icon btn-sm" onclick="deleteDailyLog('${l.id}')" style="color:var(--danger);">🗑️</button></td></tr>`;
-      });
-      tbody.innerHTML = html;
+      tbody.innerHTML = logs.map(l => `<tr><td><strong>${formatThaiDate(l.date)}</strong></td><td style="text-align:center;"><span class="badge badge-info">${l.workers} คน</span></td><td style="white-space:pre-wrap;">${escapeHtml(l.activity || "-")}</td><td style="color:var(--text-muted);">${escapeHtml(l.notes || "-")}</td><td style="text-align:center;"><div style="display:flex; justify-content:center; gap:4px;"><button class="btn-icon btn-sm" onclick="openAddDailyLogModal(${jsArg(l.id)})" title="แก้ไข">✏️</button><button class="btn-icon btn-sm" onclick="deleteDailyLog(${jsArg(l.id)})" title="ลบ" style="color:var(--danger);">🗑️</button></div></td></tr>`).join("");
     }
+    function openAddDailyLogModal(id) {
+      const log = id ? state.dailyLogs.find(l => l.id === id) : null;
+      document.getElementById("daily-log-modal-title").textContent = log ? "✏️ แก้ไขบันทึกหน้างาน" : "บันทึกคนงาน & รายงานหน้างาน";
+      document.getElementById("modal-log-id").value = log ? log.id : "";
+      document.getElementById("modal-log-date").value = log ? log.date : (state.project.statusDate || formatDate(today()));
+      document.getElementById("modal-log-workers").value = log ? log.workers : "";
+      document.getElementById("modal-log-activity").value = log ? log.activity : "";
+      document.getElementById("modal-log-notes").value = log ? log.notes : "";
+      document.getElementById("daily-log-modal").classList.add("open");
+      setTimeout(() => document.getElementById("modal-log-workers").focus(), 50);
+    }
+    function closeDailyLogModal() { document.getElementById("daily-log-modal").classList.remove("open"); }
+    function saveDailyLogModal() {
+      const id = document.getElementById("modal-log-id").value;
+      const date = document.getElementById("modal-log-date").value, workersRaw = document.getElementById("modal-log-workers").value;
+      const workers = Math.max(0, parseInt(workersRaw, 10) || 0), activity = document.getElementById("modal-log-activity").value.trim(), notes = document.getElementById("modal-log-notes").value.trim();
+      if (!date) { alert("กรุณาระบุวันที่"); return; }
+      if (workersRaw === "") { alert("กรุณาระบุจำนวนคนงาน (ใส่ 0 ได้)"); return; }
+      const sameDay = state.dailyLogs.find(l => l.date === date && l.id !== id);
+      if (sameDay && !confirm(`มีบันทึกของวันที่ ${formatThaiDate(date)} อยู่แล้ว (${sameDay.workers} คน)\nต้องการแทนที่บันทึกเดิมหรือไม่?`)) return;
+      if (sameDay) state.dailyLogs = state.dailyLogs.filter(l => l.id !== sameDay.id);
+      if (id) { const l = state.dailyLogs.find(x => x.id === id); if (l) Object.assign(l, { date, workers, activity, notes }); }
+      else state.dailyLogs.push({ id: "L" + Date.now(), date, workers, activity, notes });
+      saveState(); closeDailyLogModal(); renderDailyLogs(); drawManpowerCanvas(); updateKPICards(); showToast("บันทึกคนงานสำเร็จ");
+    }
+    function deleteDailyLog(id) { if (confirm("ลบบันทึกนี้?")) { state.dailyLogs = state.dailyLogs.filter(l => l.id !== id); saveState(); renderDailyLogs(); drawManpowerCanvas(); updateKPICards(); showToast("ลบสำเร็จ"); } }
 
-    /* MODALS LOGIC */
+    /* =========================================================
+       TASK MODAL
+       ========================================================= */
     function populateTaskCategoryOptions(selectedCategory = "") {
       const categorySelect = document.getElementById("modal-task-category");
-      if (!categorySelect) return;
-
-      const categories = [...new Set([
-        ...state.categories,
-        ...state.tasks.map(task => task.category),
-        selectedCategory,
-        "General"
-      ].map(category => (category || "").trim()).filter(Boolean))];
-
-      categorySelect.replaceChildren(...categories.map(category => {
-        const option = document.createElement("option");
-        option.value = category;
-        option.textContent = category;
-        return option;
-      }));
-      if (selectedCategory && categories.includes(selectedCategory)) {
-        categorySelect.value = selectedCategory;
-      }
+      const categories = [...new Set([...getTaskCategories(), selectedCategory, "General"].map(c => (c || "").trim()).filter(Boolean))];
+      categorySelect.replaceChildren(...categories.map(category => { const o = document.createElement("option"); o.value = category; o.textContent = category; return o; }));
+      if (selectedCategory && categories.includes(selectedCategory)) categorySelect.value = selectedCategory;
+    }
+    function setWeightFieldMode() {
+      const input = document.getElementById("modal-task-weight"), hint = document.getElementById("modal-task-weight-hint");
+      const auto = state.project.weightMode === "duration";
+      input.disabled = auto;
+      input.placeholder = auto ? "คำนวณอัตโนมัติตามระยะเวลา" : "เว้นว่าง = คิดตามสัดส่วนระยะเวลา";
+      hint.textContent = auto ? "โหมดคำนวณตามระยะเวลา — เปลี่ยนเป็น 'กำหนดเอง' ได้ที่ ⚙️ ตั้งค่าโครงการ" : "โหมดกำหนดเอง — น้ำหนักรวมไม่จำเป็นต้องเท่ากับ 100 ระบบจะเฉลี่ยสัดส่วนให้";
     }
     function openTaskModal(id) {
       const modal = document.getElementById("task-modal"), title = document.getElementById("task-modal-title"), btnDel = document.getElementById("btn-modal-delete-task");
-      const currentCategory = id ? (state.tasks.find(task => task.id === id)?.category || "") : "General";
-      populateTaskCategoryOptions(currentCategory);
-      if (id) {
-        const task = state.tasks.find(t => t.id === id); if (!task) return;
-        title.innerHTML = `✏️ แก้ไขรายการงาน: ${task.name}`;
-        document.getElementById("modal-task-id").value = task.id; document.getElementById("modal-task-name").value = task.name; document.getElementById("modal-task-category").value = task.category; document.getElementById("modal-task-assigned").value = task.assignedTo || ""; document.getElementById("modal-task-pstart").value = task.plannedStart; document.getElementById("modal-task-pend").value = task.plannedEnd; document.getElementById("modal-task-duration").value = task.duration; document.getElementById("modal-task-weight").value = task.weight || ""; document.getElementById("modal-task-value").value = task.value ?? ""; document.getElementById("modal-task-astart").value = task.actualStart || ""; document.getElementById("modal-task-aend").value = task.actualEnd || ""; document.getElementById("modal-task-progress").value = task.progress; document.getElementById("modal-task-progress-val").innerText = task.progress; document.getElementById("modal-task-notes").value = task.notes || "";
-        if (btnDel) btnDel.style.display = "inline-flex";
+      const task = id ? state.tasks.find(t => t.id === id) : null;
+      if (id && !task) return;
+      populateTaskCategoryOptions(task ? task.category : (state.taskFilters.category !== "ALL" ? state.taskFilters.category : (getTaskCategories()[0] || "General")));
+      setWeightFieldMode();
+      const set = (elId, v) => { document.getElementById(elId).value = v; };
+      if (task) {
+        title.textContent = `✏️ แก้ไขรายการงาน: ${task.name}`;
+        set("modal-task-id", task.id); set("modal-task-name", task.name); set("modal-task-assigned", task.assignedTo || "");
+        set("modal-task-pstart", task.plannedStart); set("modal-task-pend", task.plannedEnd); set("modal-task-duration", task.duration);
+        set("modal-task-weight", hasValue(task.weight) ? task.weight : ""); set("modal-task-value", task.value ?? "");
+        set("modal-task-astart", task.actualStart || ""); set("modal-task-aend", task.actualEnd || "");
+        set("modal-task-progress", task.progress); document.getElementById("modal-task-progress-val").innerText = task.progress; set("modal-task-notes", task.notes || "");
+        btnDel.style.display = "inline-flex";
       } else {
-        title.innerHTML = `➕ เพิ่มรายการงานใหม่`;
-        document.getElementById("modal-task-id").value = ""; document.getElementById("modal-task-name").value = ""; document.getElementById("modal-task-category").value = "General"; document.getElementById("modal-task-assigned").value = ""; document.getElementById("modal-task-pstart").value = state.project.statusDate || formatDate(new Date()); document.getElementById("modal-task-pend").value = formatDate(addDays(parseDate(state.project.statusDate) || new Date(), 7)); document.getElementById("modal-task-duration").value = "8"; document.getElementById("modal-task-weight").value = ""; document.getElementById("modal-task-value").value = ""; document.getElementById("modal-task-astart").value = ""; document.getElementById("modal-task-aend").value = ""; document.getElementById("modal-task-progress").value = 0; document.getElementById("modal-task-progress-val").innerText = "0"; document.getElementById("modal-task-notes").value = "";
-        if (btnDel) btnDel.style.display = "none";
+        const start = parseDate(state.project.statusDate) || today();
+        title.textContent = "➕ เพิ่มรายการงานใหม่";
+        set("modal-task-id", ""); set("modal-task-name", ""); set("modal-task-assigned", "");
+        set("modal-task-pstart", formatDate(start)); set("modal-task-pend", formatDate(addDays(start, 6)));
+        set("modal-task-weight", ""); set("modal-task-value", ""); set("modal-task-astart", ""); set("modal-task-aend", "");
+        set("modal-task-progress", 0); document.getElementById("modal-task-progress-val").innerText = "0"; set("modal-task-notes", "");
+        calculateModalDuration();
+        btnDel.style.display = "none";
       }
       modal.classList.add("open");
+      setTimeout(() => document.getElementById("modal-task-name").focus(), 50);
     }
     function closeTaskModal() { document.getElementById("task-modal").classList.remove("open"); }
     function calculateModalDuration() {
       const s = parseDate(document.getElementById("modal-task-pstart").value), e = parseDate(document.getElementById("modal-task-pend").value);
-      if (s && e) document.getElementById("modal-task-duration").value = Math.max(1, diffDays(s, e) + 1);
+      document.getElementById("modal-task-duration").value = (s && e) ? diffDays(s, e) + 1 : "";
     }
     function saveTaskModal() {
-      const id = document.getElementById("modal-task-id").value, name = document.getElementById("modal-task-name").value.trim(), category = document.getElementById("modal-task-category").value.trim() || "General", assignedTo = document.getElementById("modal-task-assigned").value.trim(), plannedStart = document.getElementById("modal-task-pstart").value, plannedEnd = document.getElementById("modal-task-pend").value, duration = parseInt(document.getElementById("modal-task-duration").value) || 1, weight = parseFloat(document.getElementById("modal-task-weight").value) || 0, taskValueInput = document.getElementById("modal-task-value").value.trim(), value = taskValueInput === "" ? null : Math.max(0, parseFloat(taskValueInput) || 0), actualStart = document.getElementById("modal-task-astart").value, actualEnd = document.getElementById("modal-task-aend").value, progress = parseFloat(document.getElementById("modal-task-progress").value) || 0, notes = document.getElementById("modal-task-notes").value.trim();
-      if (!name || !category || !plannedStart || !plannedEnd) { alert("กรุณากรอกชื่องาน หมวดหมู่ และวันที่ตามแผนให้ครบถ้วน"); return; }
-      if (id) { const t = state.tasks.find(t=>t.id===id); if(t) Object.assign(t, {name,category,assignedTo,plannedStart,plannedEnd,duration,weight,value,actualStart,actualEnd,progress,notes}); }
-      else { state.tasks.push({id:"T"+Date.now(), name,category,assignedTo,plannedStart,plannedEnd,duration,weight,value,actualStart,actualEnd,progress,notes}); }
+      const v = elId => document.getElementById(elId).value;
+      const id = v("modal-task-id"), name = v("modal-task-name").trim(), category = v("modal-task-category").trim() || "General", assignedTo = v("modal-task-assigned").trim();
+      const plannedStart = v("modal-task-pstart"), plannedEnd = v("modal-task-pend");
+      const taskValueInput = v("modal-task-value").trim(), value = taskValueInput === "" ? null : Math.max(0, parseFloat(taskValueInput) || 0);
+      let actualStart = v("modal-task-astart"), actualEnd = v("modal-task-aend");
+      const progress = clampPct(v("modal-task-progress")), notes = v("modal-task-notes").trim();
+      const weightInput = v("modal-task-weight").trim();
+
+      if (!name || !plannedStart || !plannedEnd) { alert("กรุณากรอกชื่องาน และวันที่ตามแผนให้ครบถ้วน"); return; }
+      if (parseDate(plannedEnd) < parseDate(plannedStart)) { alert("วันที่สิ้นสุดตามแผน ต้องไม่ก่อนวันที่เริ่มตามแผน"); return; }
+      if (actualStart && actualEnd && parseDate(actualEnd) < parseDate(actualStart)) { alert("วันที่แล้วเสร็จจริง ต้องไม่ก่อนวันที่เริ่มทำจริง"); return; }
+      // keep actual dates consistent with the progress value (same rule as the table slider)
+      if (progress > 0 && !actualStart) actualStart = plannedStart;
+      if (progress >= 100 && !actualEnd) actualEnd = state.project.statusDate || formatDate(today());
+      if (progress < 100 && actualEnd && !confirm("กรอกวันที่แล้วเสร็จจริงไว้ แต่ความคืบหน้ายังไม่ถึง 100%\nต้องการบันทึกต่อหรือไม่?")) return;
+
+      const duration = Math.max(1, diffDays(parseDate(plannedStart), parseDate(plannedEnd)) + 1);
+      let weight;
+      if (state.project.weightMode === "manual") {
+        if (weightInput !== "") weight = Math.max(0, parseFloat(weightInput) || 0);
+        else { // blank → share by duration relative to the other tasks
+          const others = state.tasks.filter(t => t.id !== id);
+          const totalDur = others.reduce((s, t) => s + taskDuration(t), 0) + duration;
+          weight = parseFloat(((duration / totalDur) * 100).toFixed(2));
+        }
+      }
+      const data = { name, category, assignedTo, plannedStart, plannedEnd, duration, value, actualStart, actualEnd, progress, notes };
+      if (weight !== undefined) data.weight = weight;
+      if (id) { const t = state.tasks.find(t => t.id === id); if (t) Object.assign(t, data); }
+      else state.tasks.push(Object.assign({ id: "T" + Date.now(), weight: 0 }, data));
       if (!state.categories.includes(category)) state.categories.push(category);
-      normalizeWeights(); saveState(); closeTaskModal(); renderTasks();
-      const tl = calculateProjectTimeline(); updateKPICards(tl);
-      if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
+      saveState(); closeTaskModal(); renderTasks(); refreshViews();
       showToast("บันทึกรายการสำเร็จ");
     }
 
-    function openProjectSettingsModal() { document.getElementById("cfg-project-name").value=state.project.name; document.getElementById("cfg-project-lead").value=state.project.lead; document.getElementById("cfg-project-start").value=state.project.startDate; document.getElementById("cfg-project-end").value=state.project.endDate; document.getElementById("cfg-project-value").value=state.project.totalValue || ""; document.getElementById("cfg-weight-mode").value=state.project.weightMode; document.getElementById("project-modal").classList.add("open"); }
+    /* =========================================================
+       PROJECT SETTINGS
+       ========================================================= */
+    function openProjectSettingsModal() {
+      document.getElementById("cfg-project-name").value = state.project.name; document.getElementById("cfg-project-lead").value = state.project.lead;
+      document.getElementById("cfg-project-start").value = state.project.startDate || ""; document.getElementById("cfg-project-end").value = state.project.endDate || "";
+      document.getElementById("cfg-project-value").value = state.project.totalValue || ""; document.getElementById("cfg-weight-mode").value = state.project.weightMode;
+      document.getElementById("project-modal").classList.add("open");
+    }
     function closeProjectSettingsModal() { document.getElementById("project-modal").classList.remove("open"); }
     function saveProjectSettingsModal() {
-      state.project.name = document.getElementById("cfg-project-name").value.trim() || "My Project"; state.project.lead = document.getElementById("cfg-project-lead").value.trim() || "-"; state.project.startDate = document.getElementById("cfg-project-start").value; state.project.endDate = document.getElementById("cfg-project-end").value; state.project.totalValue = Math.max(0, parseFloat(document.getElementById("cfg-project-value").value) || 0); state.project.weightMode = document.getElementById("cfg-weight-mode").value;
-      saveState(); closeProjectSettingsModal(); renderTasks();
-      const tl = calculateProjectTimeline(); updateKPICards(tl);
-      if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
+      const start = document.getElementById("cfg-project-start").value, end = document.getElementById("cfg-project-end").value;
+      if (start && end && parseDate(end) < parseDate(start)) { alert("วันสิ้นสุดโครงการ ต้องไม่ก่อนวันเริ่มต้นโครงการ"); return; }
+      state.project.name = document.getElementById("cfg-project-name").value.trim() || "My Project";
+      state.project.lead = document.getElementById("cfg-project-lead").value.trim() || "-";
+      state.project.startDate = start; state.project.endDate = end;
+      state.project.totalValue = Math.max(0, parseFloat(document.getElementById("cfg-project-value").value) || 0);
+      state.project.weightMode = document.getElementById("cfg-weight-mode").value;
+      saveState(); closeProjectSettingsModal(); renderTasks(); refreshViews();
       showToast("บันทึกการตั้งค่าสำเร็จ");
     }
 
-    function openAddDailyLogModal() { document.getElementById("modal-log-id").value=""; document.getElementById("modal-log-date").value=state.project.statusDate; document.getElementById("modal-log-workers").value="4"; document.getElementById("modal-log-activity").value=""; document.getElementById("modal-log-notes").value=""; document.getElementById("daily-log-modal").classList.add("open"); }
-    function closeDailyLogModal() { document.getElementById("daily-log-modal").classList.remove("open"); }
-    function saveDailyLogModal() {
-      const date = document.getElementById("modal-log-date").value, workers = parseInt(document.getElementById("modal-log-workers").value) || 0, activity = document.getElementById("modal-log-activity").value.trim(), notes = document.getElementById("modal-log-notes").value.trim();
-      if (!date) { alert("ระบุวันที่"); return; }
-      state.dailyLogs.push({id:"L"+Date.now(), date, workers, activity, notes}); saveState(); closeDailyLogModal(); renderDailyLogs(); drawManpowerCanvas(); updateKPICards(); showToast("บันทึกคนงานสำเร็จ");
-    }
-    function deleteDailyLog(id) { if (confirm("ลบบันทึกนี้?")) { state.dailyLogs = state.dailyLogs.filter(l=>l.id!==id); saveState(); renderDailyLogs(); drawManpowerCanvas(); updateKPICards(); showToast("ลบสำเร็จ"); } }
-
-    /* IMPORT/EXPORT/THEME */
+    /* =========================================================
+       STATUS DATE / TABS / THEME
+       ========================================================= */
     function onStatusDateChange(d) {
-      if(!d) return; state.project.statusDate = d; saveState(); const tl = calculateProjectTimeline(); updateKPICards(tl); renderTasks();
-      if (state.activeTab === "tab-scurve") drawSCurveCanvas(tl); else if (state.activeTab === "tab-gantt") renderGantt();
+      if (!d) { document.getElementById("status-date-input").value = state.project.statusDate || ""; return; }
+      state.project.statusDate = d; saveState(); renderTasks(); refreshViews();
       showToast(`เปลี่ยนวันประเมินผลเป็น: ${formatThaiDate(d)}`);
     }
+    // Redraw whatever is visible + always the KPI cards.
+    function refreshViews() {
+      const tl = getTimeline();
+      updateKPICards(tl);
+      if (state.activeTab === "tab-scurve") { drawSCurveCanvas(tl); renderVarianceAnalysis(tl); }
+      else if (state.activeTab === "tab-gantt") renderGantt();
+      else if (state.activeTab === "tab-manpower") { drawManpowerCanvas(); renderDailyLogs(); }
+    }
+    function refreshAll() {
+      document.getElementById("task-search-input").value = state.taskFilters.search;
+      document.getElementById("task-status-filter").value = state.taskFilters.status;
+      renderTasks(); renderDailyLogs(); renderCharts();
+      if (state.activeTab === "tab-gantt") renderGantt();
+    }
+    let ganttScrolledOnce = false;
     function switchTab(id) {
-      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active")); document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-      const btn = Array.from(document.querySelectorAll(".tab-btn")).find(b => b.getAttribute("onclick").includes(id)); if (btn) btn.classList.add("active");
-      const tgt = document.getElementById(id); if (tgt) tgt.classList.add("active");
+      if (id !== "tab-gantt") toggleGanttExpanded(false);
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", (b.getAttribute("onclick") || "").includes(`'${id}'`)));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.id === id));
       state.activeTab = id;
-      
       requestAnimationFrame(() => {
         if (id === "tab-scurve") renderCharts();
-        else if (id === "tab-gantt") renderGantt();
-        else if (id === "tab-tasks") { renderTasks(); setTimeout(initResizableColumns, 50); }
+        else if (id === "tab-gantt") { renderGantt(); if (!ganttScrolledOnce) { ganttScrolledOnce = true; scrollGanttToToday(false); } }
+        else if (id === "tab-tasks") renderTasks();
         else if (id === "tab-manpower") { drawManpowerCanvas(); renderDailyLogs(); }
       });
     }
+    function applyTheme(theme) {
+      document.body.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+      try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* ignore */ }
+    }
     function toggleTheme() {
-      document.body.setAttribute("data-theme", document.body.getAttribute("data-theme") === "dark" ? "light" : "dark");
-      if (state.activeTab === "tab-scurve") drawSCurveCanvas(calculateProjectTimeline()); else if (state.activeTab === "tab-gantt") renderGantt(); else if (state.activeTab === "tab-manpower") drawManpowerCanvas();
+      applyTheme(document.body.getAttribute("data-theme") === "dark" ? "light" : "dark");
+      refreshViews();
+    }
+
+    /* =========================================================
+       IMPORT / EXPORT
+       ========================================================= */
+    function safeFileName(s) { return String(s || "Project").replace(/[\\/:*?"<>|]+/g, "_").trim() || "Project"; }
+    function downloadBlob(blob, filename) {
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
     function exportDataJSON() {
-      const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2)), a = document.createElement("a");
-      a.href = str; a.download = `Project_${state.project.name}.json`; document.body.appendChild(a); a.click(); a.remove(); showToast("ส่งออก JSON สำเร็จ");
+      const data = { app: "S-Curve Project Planner", version: 2, exportedAt: new Date().toISOString(), project: state.project, tasks: state.tasks, categories: state.categories, dailyLogs: state.dailyLogs };
+      downloadBlob(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }), `Project_${safeFileName(state.project.name)}_${formatDate(today())}.json`);
+      showToast("ส่งออก JSON สำเร็จ");
     }
     function triggerImportJSON() { document.getElementById("json-file-input").click(); }
     function importDataJSON(e) {
       const f = e.target.files[0]; if (!f) return;
-      const r = new FileReader(); r.onload = ev => {
-        try { const p = JSON.parse(ev.target.result); if (p && p.project) { state.project=p.project; state.tasks=p.tasks; state.categories=p.categories||[]; state.dailyLogs=p.dailyLogs||[]; saveState(); initApp(); showToast("นำเข้าข้อมูลสำเร็จ"); } } catch(err) { alert("ไฟล์ไม่ถูกต้อง"); }
-      }; r.readAsText(f); e.target.value = "";
+      const r = new FileReader();
+      r.onload = ev => {
+        try {
+          const p = JSON.parse(ev.target.result);
+          if (!p || typeof p !== "object" || !p.project || !Array.isArray(p.tasks)) throw new Error("โครงสร้างไฟล์ไม่ถูกต้อง (ต้องมี project และ tasks)");
+          if (!confirm(`นำเข้าโครงการ "${p.project.name || "-"}" (${p.tasks.length} งาน)?\nข้อมูลปัจจุบันจะถูกแทนที่`)) return;
+          applyData(p); saveState(); closeProjectSettingsModal(); refreshAll(); showToast("นำเข้าข้อมูลสำเร็จ");
+        } catch (err) { alert("ไฟล์ไม่ถูกต้อง: " + (err.message || err)); }
+      };
+      r.readAsText(f); e.target.value = "";
+    }
+    function triggerImportCSV() { document.getElementById("csv-file-input").click(); }
+    function parseCSVRows(text) {
+      text = text.replace(/^﻿/, "");
+      const firstLine = text.split(/\r?\n/, 1)[0] || "";
+      const delimiter = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ";" : ",";
+      const rows = []; let row = [], field = "", quoted = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (quoted) {
+          if (ch === '"' && text[i + 1] === '"') { field += '"'; i++; }
+          else if (ch === '"') quoted = false;
+          else field += ch;
+        } else if (ch === '"') quoted = true;
+        else if (ch === delimiter) { row.push(field); field = ""; }
+        else if (ch === "\n" || ch === "\r") {
+          if (ch === "\r" && text[i + 1] === "\n") i++;
+          row.push(field); field = "";
+          if (row.some(value => value.trim() !== "")) rows.push(row);
+          row = [];
+        } else field += ch;
+      }
+      row.push(field);
+      if (row.some(value => value.trim() !== "")) rows.push(row);
+      return rows;
+    }
+    // Accepts YYYY-MM-DD and D/M/YYYY (ค.ศ. or พ.ศ. — years > 2400 are converted from พ.ศ.)
+    function csvDateValue(value) {
+      const v = (value || "").trim();
+      let y, m, d;
+      let mt = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (mt) { y = +mt[1]; m = +mt[2]; d = +mt[3]; }
+      else if ((mt = v.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/))) { d = +mt[1]; m = +mt[2]; y = +mt[3]; }
+      else return "";
+      if (y > 2400) y -= 543;
+      const s = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      const check = parseDate(s);
+      return check && check.getMonth() === m - 1 && check.getDate() === d ? s : "";
+    }
+    function importTasksCSV(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          const rows = parseCSVRows(event.target.result);
+          if (rows.length < 2) throw new Error("CSV ไม่มีข้อมูลรายการงาน");
+          const headers = rows[0].map(value => value.trim().toLowerCase());
+          const findColumn = (...aliases) => headers.findIndex(header => aliases.includes(header));
+          const columns = {
+            id: findColumn("id"), category: findColumn("หมวดหมู่", "category"), name: findColumn("ชื่องาน", "รายการงาน", "task name", "name"),
+            assignedTo: findColumn("ผู้รับผิดชอบ", "assigned to", "assignee"), plannedStart: findColumn("วันที่เริ่มตามแผน", "planned start"), plannedEnd: findColumn("วันที่สิ้นสุดตามแผน", "planned end"),
+            duration: findColumn("ระยะเวลา(วัน)", "ระยะเวลา (วัน)", "duration"), actualStart: findColumn("วันที่เริ่มจริง", "actual start"), actualEnd: findColumn("วันที่สิ้นสุดจริง", "actual end"),
+            progress: findColumn("ความคืบหน้า(%)", "ความคืบหน้า (%)", "progress", "actual progress"), weight: findColumn("น้ำหนัก(%)", "น้ำหนัก (%)", "weight"), value: findColumn("มูลค่างาน(บาท)", "มูลค่างาน (บาท)", "task value", "value"), notes: findColumn("หมายเหตุ", "notes")
+          };
+          if (columns.name < 0 || columns.plannedStart < 0 || columns.plannedEnd < 0) throw new Error("ต้องมีคอลัมน์ ชื่องาน, วันที่เริ่มตามแผน และวันที่สิ้นสุดตามแผน");
+          const read = (row, column) => column < 0 ? "" : (row[column] || "").trim();
+          const imported = []; let skipped = 0;
+          rows.slice(1).forEach((row, index) => {
+            const name = read(row, columns.name), plannedStart = csvDateValue(read(row, columns.plannedStart)), plannedEnd = csvDateValue(read(row, columns.plannedEnd));
+            if (!name || !plannedStart || !plannedEnd || plannedEnd < plannedStart) { skipped++; return; }
+            const weightValue = parseFloat(read(row, columns.weight));
+            const valueText = read(row, columns.value).replace(/,/g, ""), valueNumber = parseFloat(valueText);
+            const progressValue = parseFloat(read(row, columns.progress));
+            imported.push({
+              id: read(row, columns.id) || `CSV${Date.now()}${index}`,
+              category: read(row, columns.category) || "General", name,
+              assignedTo: read(row, columns.assignedTo), plannedStart, plannedEnd,
+              actualStart: csvDateValue(read(row, columns.actualStart)), actualEnd: csvDateValue(read(row, columns.actualEnd)),
+              progress: Number.isFinite(progressValue) ? clampPct(progressValue) : 0,
+              weight: Number.isFinite(weightValue) ? Math.max(0, weightValue) : 0,
+              value: valueText === "" || !Number.isFinite(valueNumber) ? null : Math.max(0, valueNumber),
+              notes: read(row, columns.notes)
+            });
+          });
+          if (imported.length === 0) throw new Error("ไม่พบแถวงานที่มีข้อมูลครบถ้วน");
+          const skippedMessage = skipped ? ` (ข้าม ${skipped} แถวที่ข้อมูลไม่ครบ/วันที่ผิด)` : "";
+          if (!confirm(`นำเข้า ${imported.length} รายการ${skippedMessage} และแทนที่รายการงานปัจจุบันหรือไม่?`)) return;
+          // If the CSV has weights, switch to manual mode so they are not overwritten.
+          const hasWeights = columns.weight >= 0 && imported.some(t => t.weight > 0);
+          applyData({ project: Object.assign({}, state.project, hasWeights ? { weightMode: "manual" } : {}), tasks: imported, categories: [...state.categories, ...imported.map(t => t.category)], dailyLogs: state.dailyLogs });
+          saveState(); closeProjectSettingsModal(); refreshAll();
+          showToast(`นำเข้า CSV ${imported.length} รายการสำเร็จ${hasWeights ? " (ใช้น้ำหนักจากไฟล์ — โหมดกำหนดเอง)" : ""}`);
+        } catch (error) { alert(error.message || "อ่านไฟล์ CSV ไม่สำเร็จ"); }
+        finally { e.target.value = ""; }
+      };
+      reader.onerror = () => { alert("อ่านไฟล์ CSV ไม่สำเร็จ"); e.target.value = ""; };
+      reader.readAsText(file, "UTF-8");
     }
     function exportToCSV() {
-      let csv = "\uFEFFID,หมวดหมู่,ชื่องาน,ผู้รับผิดชอบ,วันที่เริ่มตามแผน,วันที่สิ้นสุดตามแผน,ระยะเวลา(วัน),วันที่เริ่มจริง,วันที่สิ้นสุดจริง,ความคืบหน้า(%),น้ำหนัก(%),มูลค่างาน(บาท)\n";
-      state.tasks.forEach(t => csv += `"${t.id}","${t.category}","${t.name}","${t.assignedTo||''}","${t.plannedStart}","${t.plannedEnd}",${t.duration},"${t.actualStart||''}","${t.actualEnd||''}",${t.progress},${t.weight},"${t.value ?? ''}"\n`);
-      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv;charset=utf-8;"})); a.download = `Tasks.csv`; document.body.appendChild(a); a.click(); a.remove(); showToast("ส่งออก CSV สำเร็จ");
+      const csvEscape = value => `"${String(value ?? "").replace(/"/g, '""')}"`;
+      const headers = ["ID", "หมวดหมู่", "ชื่องาน", "ผู้รับผิดชอบ", "วันที่เริ่มตามแผน", "วันที่สิ้นสุดตามแผน", "ระยะเวลา(วัน)", "วันที่เริ่มจริง", "วันที่สิ้นสุดจริง", "ความคืบหน้า(%)", "น้ำหนัก(%)", "มูลค่างาน(บาท)", "หมายเหตุ"];
+      const rows = [headers.map(csvEscape).join(",")];
+      state.tasks.forEach(t => rows.push([t.id, t.category, t.name, t.assignedTo, t.plannedStart, t.plannedEnd, t.duration, t.actualStart, t.actualEnd, t.progress, t.weight, t.value, t.notes].map(csvEscape).join(",")));
+      downloadBlob(new Blob(["﻿" + rows.join("\r\n") + "\r\n"], { type: "text/csv;charset=utf-8;" }), `Tasks_${safeFileName(state.project.name)}.csv`);
+      showToast("ส่งออก CSV สำเร็จ");
     }
-    function downloadChartImage() { const c = document.getElementById("scurve-canvas"); if(c){ const a = document.createElement("a"); a.download="SCurve.png"; a.href=c.toDataURL("image/png"); a.click(); showToast("บันทึกกราฟเรียบร้อย"); } }
-    function showToast(txt) { const t = document.getElementById("toast-msg"); document.getElementById("toast-text").innerText = txt; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 3000); }
+    function downloadChartImage() {
+      const c = document.getElementById("scurve-canvas"); if (!c) return;
+      chartHoverInfo = { active: false }; document.getElementById("chart-tooltip").style.display = "none";
+      drawSCurveCanvas(getTimeline());
+      const a = document.createElement("a"); a.download = `SCurve_${safeFileName(state.project.name)}_${state.project.statusDate || ""}.png`; a.href = c.toDataURL("image/png");
+      document.body.appendChild(a); a.click(); a.remove(); showToast("บันทึกกราฟเรียบร้อย");
+    }
+    let toastTimer = null;
+    function showToast(txt) {
+      const t = document.getElementById("toast-msg"); document.getElementById("toast-text").innerText = txt; t.classList.add("show");
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
+    }
 
-    /* INIT */
+    /* =========================================================
+       INIT (event listeners are registered exactly once)
+       ========================================================= */
+    function setupGlobalListeners() {
+      setupCanvasHover();
+      const modalIds = ["task-modal", "category-manager-modal", "project-modal", "daily-log-modal"];
+      // Close a modal by clicking its dark backdrop (only if the press also started there).
+      modalIds.forEach(mid => {
+        const overlay = document.getElementById(mid); let downOnOverlay = false;
+        overlay.addEventListener("mousedown", e => { downOnOverlay = e.target === overlay; });
+        overlay.addEventListener("click", e => { if (downOnOverlay && e.target === overlay) overlay.classList.remove("open"); });
+      });
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+          const open = modalIds.map(id => document.getElementById(id)).filter(m => m.classList.contains("open"));
+          if (open.length) open.forEach(m => m.classList.remove("open"));
+          else toggleGanttExpanded(false);
+        } else if (e.key === "Enter" && !e.shiftKey && (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") && e.target.type !== "file") {
+          if (document.getElementById("task-modal").classList.contains("open") && e.target.closest("#task-modal")) { e.preventDefault(); saveTaskModal(); }
+          else if (document.getElementById("daily-log-modal").classList.contains("open") && e.target.closest("#daily-log-modal")) { e.preventDefault(); saveDailyLogModal(); }
+        }
+      });
+      document.addEventListener("mouseup", () => { if (!draggedTaskId) document.querySelectorAll('.task-row-item[draggable="true"]').forEach(r => r.setAttribute("draggable", "false")); });
+      let resizeTimer = null;
+      window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(refreshViews, 120); });
+      // Other tabs/windows editing the same project: reload to avoid overwriting newer data.
+      window.addEventListener("storage", e => { if (e.key === STORAGE_KEY) { loadState(); refreshAll(); showToast("ข้อมูลถูกอัปเดตจากอีกแท็บ"); } });
+      // Redraw canvases once the web font is ready (Thai labels otherwise use a fallback font).
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => refreshViews());
+    }
     function initApp() {
-      loadState(); renderTasks(); renderDailyLogs(); setupCanvasHover(); renderCharts();
-      document.addEventListener("keydown", e => { if (e.key === "Escape") toggleGanttExpanded(false); });
-      window.addEventListener("resize", () => { if (state.activeTab === "tab-scurve") drawSCurveCanvas(calculateProjectTimeline()); else if (state.activeTab === "tab-gantt") renderGantt(); else if (state.activeTab === "tab-manpower") drawManpowerCanvas(); });
+      let theme = "light"; try { theme = localStorage.getItem(THEME_KEY) || "light"; } catch (e) { /* ignore */ }
+      document.body.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+      loadState();
+      setupGlobalListeners();
+      refreshAll();
     }
     window.addEventListener("DOMContentLoaded", initApp);
   </script>
