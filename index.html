@@ -4,389 +4,480 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Project Planner & S-Curve Dashboard</title>
-  <!-- Google Fonts: Prompt & Inter -->
+  <!-- Google Fonts: IBM Plex Sans Thai & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* =========================================================
+       DESIGN TOKENS — minimal white / charcoal / amber
+       (inspired by the CMU STeP website look & feel)
+       ========================================================= */
     :root {
-      --font-family: 'Prompt', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --bg-body: #f8fafc;
+      --font-family: 'IBM Plex Sans Thai', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-display: 'IBM Plex Sans Thai', 'Inter', sans-serif;
+      --bg-body: #ffffff;
       --bg-card: #ffffff;
-      --bg-subtle: #f1f5f9;
-      --border-color: #e2e8f0;
-      --border-subtle: #edf2f7;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --text-subtle: #94a3b8;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --primary-subtle: #dbeafe;
-      --primary-dark: #1e40af;
-      --success: #10b981;
-      --success-subtle: #d1fae5;
-      --warning: #f59e0b;
-      --warning-subtle: #fef3c7;
-      --danger: #ef4444;
-      --danger-hover: #dc2626;
-      --danger-subtle: #fee2e2;
-      --planned-color: #3b82f6;
-      --actual-color: #10b981;
-      --forecast-color: #f59e0b;
-      --cutoff-color: #ef4444;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --bg-band: #f5f5f5;
+      --bg-subtle: #f4f5f7;
+      --border-color: #e3e6ea;
+      --border-strong: #cfd4da;
+      --text-main: #2b333d;
+      --text-muted: #6c757d;
+      --text-subtle: #9aa1a9;
+      --ink: #2b333d;
+      --ink-hover: #3b4552;
+      --accent: #f7a400;
+      --accent-strong: #e09500;
+      --accent-subtle: #fff4d9;
+      --primary: #2b333d;
+      --primary-hover: #3b4552;
+      --primary-subtle: #fff4d9;
+      --success: #2e9e6b;
+      --success-subtle: #e3f4ec;
+      --warning: #f7a400;
+      --warning-subtle: #fff4d9;
+      --danger: #d9534f;
+      --danger-hover: #c2403c;
+      --danger-subtle: #fbe7e6;
+      --planned-color: #2b333d;
+      --actual-color: #f7a400;
+      --forecast-color: #9aa1a9;
+      --cutoff-color: #d9534f;
+      --shadow-sm: 0 1px 2px rgba(43, 51, 61, 0.04);
+      --shadow-md: 0 6px 20px rgba(43, 51, 61, 0.07);
+      --shadow-lg: 0 18px 40px rgba(43, 51, 61, 0.14);
       --radius-sm: 6px;
       --radius-md: 10px;
-      --radius-lg: 14px;
-      --radius-xl: 18px;
+      --radius-lg: 12px;
+      --radius-pill: 999px;
+      --header-h: 68px;
     }
 
     [data-theme="dark"] {
-      --bg-body: #0b1120;
-      --bg-card: #1e293b;
-      --bg-subtle: #334155;
-      --border-color: #334155;
-      --border-subtle: #1e293b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-subtle: #64748b;
-      --primary: #3b82f6;
-      --primary-hover: #60a5fa;
-      --primary-subtle: #1e3a8a;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+      --bg-body: #15191e;
+      --bg-card: #1d2229;
+      --bg-band: #1a1e24;
+      --bg-subtle: #242a32;
+      --border-color: #2f363f;
+      --border-strong: #3d4550;
+      --text-main: #eef0f2;
+      --text-muted: #a3aab2;
+      --text-subtle: #737b85;
+      --ink: #eef0f2;
+      --ink-hover: #ffffff;
+      --primary: #f7a400;
+      --primary-hover: #ffb52e;
+      --primary-subtle: rgba(247, 164, 0, 0.16);
+      --accent-subtle: rgba(247, 164, 0, 0.16);
+      --success-subtle: rgba(46, 158, 107, 0.18);
+      --danger-subtle: rgba(217, 83, 79, 0.18);
+      --warning-subtle: rgba(247, 164, 0, 0.16);
+      --planned-color: #c9ced4;
+      --forecast-color: #737b85;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.55);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
       font-family: var(--font-family);
       background-color: var(--bg-body);
       color: var(--text-main);
-      line-height: 1.5;
+      line-height: 1.55;
+      font-size: 15px;
       -webkit-font-smoothing: antialiased;
       transition: background-color 0.25s ease, color 0.25s ease;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
+    svg.ic { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: var(--bg-subtle); }
-    ::-webkit-scrollbar-thumb { background: var(--text-subtle); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-subtle); }
 
-    .container { max-width: 1480px; margin: 0 auto; padding: 0 20px; width: 100%; }
+    .container { max-width: 1440px; margin: 0 auto; padding: 0 32px; width: 100%; }
 
-    /* Header Nav */
-    header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow-sm); }
-    .header-content { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; flex-wrap: wrap; gap: 12px; }
-    .header-left { display: flex; align-items: center; gap: 14px; }
-    .brand-icon { width: 44px; height: 44px; border-radius: var(--radius-md); background: linear-gradient(135deg, #2563eb, #06b6d4); display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35); flex-shrink: 0; }
-    .project-title-box h1 { font-size: 1.35rem; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text-main); }
-    .project-title-box p { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-    .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    /* ---------- Header / navigation ---------- */
+    header.site-header { background: color-mix(in srgb, var(--bg-card) 92%, transparent); backdrop-filter: saturate(160%) blur(10px); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; }
+    .header-content { display: flex; align-items: center; gap: 28px; height: var(--header-h); }
+    .brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; text-decoration: none; color: var(--text-main); }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; }
+    .brand-name { font-weight: 600; font-size: 0.95rem; letter-spacing: 0.2px; line-height: 1.1; }
+    .brand-name small { display: block; font-weight: 400; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1.4px; text-transform: uppercase; }
+    .header-right { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
 
-    /* Buttons */
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; font-size: 0.875rem; font-weight: 500; padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent; outline: none; white-space: nowrap; user-select: none; }
-    .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25); }
-    .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
-    .btn-secondary { background-color: var(--bg-card); color: var(--text-main); border-color: var(--border-color); }
-    .btn-secondary:hover { background-color: var(--bg-subtle); }
-    .btn-success { background-color: var(--success); color: white; }
-    .btn-success:hover { filter: brightness(1.08); }
+    .tab-bar { display: flex; align-items: stretch; gap: 4px; height: 100%; overflow-x: auto; scrollbar-width: none; }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn { position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 0 14px; font-family: inherit; font-size: 0.9rem; font-weight: 400; color: var(--text-muted); background: transparent; border: none; cursor: pointer; transition: color 0.2s ease; white-space: nowrap; }
+    .tab-btn::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: -1px; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.25s ease; }
+    .tab-btn:hover { color: var(--text-main); }
+    .tab-btn.active { color: var(--text-main); font-weight: 500; }
+    .tab-btn.active::after { transform: scaleX(1); }
+    .tab-count { display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--bg-subtle); font-size: 0.72rem; font-weight: 600; color: var(--text-muted); }
+    .tab-btn.active .tab-count { background: var(--accent-subtle); color: var(--accent-strong); }
+
+    /* ---------- Buttons (pill shaped) ---------- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-family: inherit; font-size: 0.86rem; font-weight: 500; padding: 9px 18px; border-radius: var(--radius-pill); cursor: pointer; transition: all 0.18s ease; border: 1px solid transparent; outline: none; white-space: nowrap; user-select: none; line-height: 1.2; }
+    .btn:focus-visible, .btn-icon:focus-visible, .tab-btn:focus-visible { box-shadow: 0 0 0 3px var(--accent-subtle); }
+    .btn-primary { background-color: var(--ink); color: var(--bg-card); }
+    .btn-primary:hover { background-color: var(--ink-hover); }
+    [data-theme="dark"] .btn-primary { background: var(--accent); color: #1d2229; }
+    [data-theme="dark"] .btn-primary:hover { background: var(--primary-hover); }
+    .btn-accent { background: var(--accent); color: #2b333d; }
+    .btn-accent:hover { background: var(--accent-strong); }
+    .btn-secondary { background-color: transparent; color: var(--text-main); border-color: var(--border-strong); }
+    .btn-secondary:hover { border-color: var(--text-main); }
     .btn-danger { background-color: var(--danger); color: white; }
-    .btn-danger:hover { background-color: var(--danger-hover); transform: translateY(-1px); }
+    .btn-danger:hover { background-color: var(--danger-hover); }
     .btn-outline-danger { background-color: transparent; color: var(--danger); border-color: var(--danger); }
     .btn-outline-danger:hover { background-color: var(--danger-subtle); }
-    .btn-sm { padding: 5px 10px; font-size: 0.78rem; border-radius: 4px; }
-    .btn-icon { padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
-    .btn-icon:hover { background: var(--bg-subtle); border-color: var(--text-subtle); }
+    .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+    .btn-icon { width: 36px; height: 36px; padding: 0; border-radius: 50%; border: 1px solid var(--border-color); background: transparent; color: var(--text-main); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
+    .btn-icon:hover { border-color: var(--text-main); }
+    .btn-icon.btn-sm { width: 30px; height: 30px; }
+    .btn-icon.btn-sm svg.ic { width: 15px; height: 15px; }
+    .btn-icon.danger:hover { color: var(--danger); border-color: var(--danger); }
 
-    /* Date Picker Input in Header */
-    .status-date-badge { display: flex; align-items: center; gap: 8px; background: var(--bg-subtle); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: var(--radius-md); font-size: 0.85rem; }
-    .status-date-badge label { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; }
-    .status-date-badge input[type="date"] { border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); padding: 4px 8px; border-radius: 4px; font-family: inherit; font-size: 0.82rem; outline: none; cursor: pointer; }
+    /* status date control */
+    .status-date-badge { display: flex; align-items: center; gap: 6px; border: 1px solid var(--border-color); padding: 3px 4px 3px 14px; border-radius: var(--radius-pill); font-size: 0.82rem; }
+    .status-date-badge label { color: var(--text-muted); font-size: 0.78rem; white-space: nowrap; }
+    .status-date-badge input[type="date"] { border: none; background: transparent; color: var(--text-main); padding: 4px 2px; font-family: inherit; font-size: 0.84rem; font-weight: 500; outline: none; cursor: pointer; }
+    [data-theme="dark"] .status-date-badge input[type="date"] { color-scheme: dark; }
+    .status-date-badge .btn { padding: 5px 12px; }
 
-    /* KPI Summary Row */
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin: 20px 0; }
-    .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px 18px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .kpi-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .kpi-title { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .kpi-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
-    .kpi-icon.blue { background: #dbeafe; color: #2563eb; }
-    .kpi-icon.green { background: #d1fae5; color: #059669; }
-    .kpi-icon.amber { background: #fef3c7; color: #d97706; }
-    .kpi-icon.purple { background: #ede9fe; color: #7c3aed; }
-    .kpi-icon.cyan { background: #cffafe; color: #0891b2; }
+    /* ---------- Hero ---------- */
+    .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--border-color); }
+    .hero-inner { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); align-items: center; gap: 40px; padding-top: 46px; padding-bottom: 40px; position: relative; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 0.74rem; letter-spacing: 2.4px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+    .hero-eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+    .hero h1 { font-family: var(--font-display); font-weight: 300; font-size: clamp(2rem, 3.6vw, 3.2rem); line-height: 1.12; letter-spacing: -0.5px; color: var(--text-main); }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 16px; font-size: 0.9rem; color: var(--text-muted); }
+    .hero-meta span { display: inline-flex; align-items: center; gap: 7px; }
+    .hero-meta strong { color: var(--text-main); font-weight: 500; }
+    .hero-progress { position: relative; text-align: right; padding-left: 40px; }
+    .hero-progress::before { content: ""; position: absolute; left: 0; top: 50%; width: 160px; height: 1px; background: var(--text-main); opacity: 0.35; transform: translate(-70%, -50%) rotate(-48deg); }
+    .hero-progress .label { font-size: 0.82rem; color: var(--text-muted); }
+    .hero-progress .big { font-family: var(--font-display); font-weight: 300; font-size: clamp(3rem, 6vw, 4.8rem); line-height: 1; color: var(--accent); letter-spacing: -1px; }
+    .hero-progress .big small { font-size: 0.4em; font-weight: 400; color: var(--text-muted); margin-left: 4px; }
+    .hero-progress .sub { margin-top: 8px; font-size: 0.86rem; color: var(--text-muted); }
+    .hero-bar { margin-top: 14px; height: 4px; border-radius: 4px; background: var(--bg-subtle); position: relative; overflow: hidden; }
+    .hero-bar > i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 4px; transition: width 0.4s ease; }
+    .hero-bar > b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text-main); }
 
-    .kpi-value { font-size: 1.85rem; font-weight: 700; color: var(--text-main); line-height: 1.1; margin-bottom: 6px; display: flex; align-items: baseline; gap: 4px; }
-    .kpi-value .unit { font-size: 0.95rem; font-weight: 500; color: var(--text-muted); }
-    .kpi-footer { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; line-height: 1; }
-    .badge-success { background: var(--success-subtle); color: #065f46; }
-    .badge-warning { background: var(--warning-subtle); color: #92400e; }
-    .badge-danger { background: var(--danger-subtle); color: #991b1b; }
-    .badge-info { background: var(--primary-subtle); color: #1e40af; }
+    /* hero + KPI band only on the overview tab; other tabs get the full screen for their tables */
+    body[data-tab]:not([data-tab="tab-scurve"]) .hero, body[data-tab]:not([data-tab="tab-scurve"]) .kpi-band { display: none; }
+
+    /* ---------- KPI band ---------- */
+    .kpi-band { background: var(--bg-band); border-bottom: 1px solid var(--border-color); }
+    .kpi-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .kpi-card { padding: 30px 22px 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; position: relative; }
+    .kpi-card + .kpi-card::before { content: ""; position: absolute; left: 0; top: 28%; bottom: 28%; width: 1px; background: var(--border-strong); opacity: 0.6; }
+    .kpi-card { transition: background 0.2s ease; }
+    .kpi-card:hover { background: color-mix(in srgb, var(--kc) 6%, transparent); }
+    .kpi-card::after { content: ""; position: absolute; top: 0; left: 32%; right: 32%; height: 3px; border-radius: 0 0 3px 3px; background: var(--kc); }
+    .kpi-icon { width: 62px; height: 62px; padding: 14px; border-radius: 50%; margin-bottom: 8px; color: var(--kc); background: color-mix(in srgb, var(--kc) 14%, transparent); box-shadow: 0 0 0 6px color-mix(in srgb, var(--kc) 6%, transparent); transition: transform 0.25s ease; }
+    .kpi-card:hover .kpi-icon { transform: translateY(-2px) scale(1.04); }
+    .kpi-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .kpi-icon svg .hl { stroke: currentColor; stroke-width: 2.6; }
+    .kpi-value { font-size: 1.85rem; font-weight: 600; color: var(--text-main); line-height: 1.1; display: flex; align-items: baseline; justify-content: center; gap: 4px; letter-spacing: -0.3px; }
+    .kpi-value .unit { font-size: 0.85rem; font-weight: 400; color: var(--text-muted); }
+    .kpi-meter { width: 72%; max-width: 150px; height: 5px; border-radius: 5px; background: color-mix(in srgb, var(--kc) 16%, transparent); overflow: hidden; margin: 6px 0 2px; }
+    .kpi-meter i { display: block; height: 100%; width: 0; background: var(--kc); border-radius: 5px; transition: width 0.6s cubic-bezier(.2,.8,.2,1); }
+    .kpi-title { font-size: 0.86rem; color: var(--text-muted); }
+    .kpi-footer { font-size: 0.76rem; color: var(--text-subtle); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; }
+    .kpi-footer strong { color: var(--text-main); font-weight: 600; }
+
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: var(--radius-pill); font-size: 0.74rem; font-weight: 500; line-height: 1.3; white-space: nowrap; }
+    .badge-success { background: var(--success-subtle); color: var(--success); }
+    .badge-warning { background: var(--warning-subtle); color: var(--accent-strong); }
+    .badge-danger { background: var(--danger-subtle); color: var(--danger); }
+    .badge-info { background: var(--bg-subtle); color: var(--text-main); }
     .badge-neutral { background: var(--bg-subtle); color: var(--text-muted); }
-    [data-theme="dark"] .badge-info { color: #bfdbfe; }
-    [data-theme="dark"] .badge-success { background: rgba(16,185,129,0.2); color: #6ee7b7; }
-    [data-theme="dark"] .badge-danger { background: rgba(239,68,68,0.2); color: #fca5a5; }
-    [data-theme="dark"] .badge-warning { background: rgba(245,158,11,0.2); color: #fcd34d; }
 
-    /* Navigation Tabs */
-    .tab-bar { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; }
-    .tab-bar::-webkit-scrollbar { display: none; }
-    .tab-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; font-family: inherit; font-size: 0.92rem; font-weight: 500; color: var(--text-muted); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
-    .tab-btn:hover { color: var(--primary); }
-    .tab-btn.active { color: var(--primary); font-weight: 600; border-bottom-color: var(--primary); }
-
+    /* ---------- Page sections ---------- */
+    main.page { flex: 1; padding-top: 36px; padding-bottom: 56px; }
     .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Main Chart Card */
-    .chart-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); margin-bottom: 24px; }
-    .chart-panel-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border-color); }
-    .chart-title-area h2 { font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .chart-title-area p { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
-    .chart-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .chart-legend { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 0.85rem; }
-    .legend-item { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-    .legend-line { width: 18px; height: 4px; border-radius: 2px; }
+    .chart-panel, .variance-table-card, .gantt-wrapper, .task-table-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); margin-bottom: 28px; }
+    .chart-panel { padding: 26px 28px; }
+    .chart-panel-header { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 22px; }
+    .chart-title-area h2, .section-title { font-family: var(--font-display); font-size: 1.35rem; font-weight: 300; letter-spacing: -0.2px; display: flex; align-items: center; gap: 12px; color: var(--text-main); }
+    .chart-title-area h2::before, .section-title::before { content: ""; width: 4px; height: 22px; background: var(--accent); border-radius: 2px; }
+    .chart-title-area p { font-size: 0.84rem; color: var(--text-muted); margin-top: 4px; padding-left: 16px; }
+    .chart-controls { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .chart-legend { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; font-size: 0.82rem; }
+    .legend-item { display: flex; align-items: center; gap: 7px; cursor: pointer; user-select: none; padding: 5px 11px; border-radius: var(--radius-pill); transition: background 0.15s; }
+    .legend-item:hover { background: var(--bg-subtle); }
+    .legend-line { width: 18px; height: 3px; border-radius: 2px; }
     .legend-line.planned { background-color: var(--planned-color); }
-    .legend-line.actual { background-color: var(--actual-color); }
-    .legend-line.forecast { background: repeating-linear-gradient(90deg, var(--forecast-color), var(--forecast-color) 4px, transparent 4px, transparent 8px); }
-    .legend-line.cutoff { background-color: var(--cutoff-color); }
+    .legend-line.actual { background-color: var(--actual-color); height: 4px; }
+    .legend-line.forecast { background: repeating-linear-gradient(90deg, var(--forecast-color), var(--forecast-color) 4px, transparent 4px, transparent 7px); }
+    .legend-line.cutoff { background-color: var(--cutoff-color); width: 3px; height: 14px; }
+    .legend-item.off { opacity: 0.35; text-decoration: line-through; }
 
     .canvas-container { position: relative; width: 100%; height: 440px; user-select: none; }
     canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
 
-    #chart-tooltip { position: absolute; background: rgba(15, 23, 42, 0.94); color: #ffffff; padding: 10px 14px; border-radius: 8px; font-size: 0.82rem; pointer-events: none; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: none; z-index: 100; min-width: 180px; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1); transform: translate(-50%, -115%); transition: opacity 0.1s ease; }
-    #chart-tooltip .tooltip-date { font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; margin-bottom: 6px; color: #93c5fd; }
-    #chart-tooltip .tooltip-row { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 3px; }
-    #chart-tooltip .tooltip-row.variance { border-top: 1px dashed rgba(255,255,255,0.2); margin-top: 6px; padding-top: 4px; font-weight: 600; }
+    #chart-tooltip { position: absolute; background: #2b333d; color: #ffffff; padding: 12px 14px; border-radius: 10px; font-size: 0.8rem; pointer-events: none; box-shadow: var(--shadow-lg); display: none; z-index: 100; min-width: 190px; transform: translate(-50%, -115%); }
+    #chart-tooltip .tooltip-date { font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px; margin-bottom: 7px; color: #f7a400; }
+    #chart-tooltip .tooltip-row { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 3px; }
+    #chart-tooltip .tooltip-row.variance { border-top: 1px dashed rgba(255,255,255,0.2); margin-top: 6px; padding-top: 5px; font-weight: 500; }
 
-    /* Performance Breakdown Table */
-    .variance-table-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
-    .variance-table-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-    .perf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-    .perf-box { background: var(--bg-subtle); border-radius: var(--radius-md); padding: 14px 16px; border: 1px solid var(--border-color); }
-    .perf-box-title { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-    .perf-box-desc { font-size: 0.88rem; color: var(--text-main); }
+    .variance-table-card { padding: 26px 28px; }
+    .variance-table-card h3 { margin-bottom: 20px; }
+    .perf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0; }
+    .perf-box { padding: 4px 24px; border-left: 1px solid var(--border-color); }
+    .perf-box:first-child { border-left: none; padding-left: 0; }
+    .perf-box-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 1.6px; color: var(--text-subtle); margin-bottom: 8px; }
+    .perf-box-desc { font-size: 0.9rem; color: var(--text-main); }
+    .perf-box-desc strong { font-size: 1.05rem; font-weight: 600; }
 
-    /* Gantt Chart Container */
-    .gantt-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 24px; isolation: isolate; /* keeps sticky z-indexes inside the card, never above the page header */ }
-    .gantt-wrapper.gantt-expanded { position: fixed; inset: 12px; z-index: 500; display: flex; flex-direction: column; margin: 0; border-radius: var(--radius-lg); }
+    /* ---------- Gantt ---------- */
+    .gantt-wrapper { overflow: hidden; isolation: isolate; /* keeps sticky z-indexes inside the card, never above the page header */ }
+    .gantt-wrapper.gantt-expanded { position: fixed; inset: 12px; z-index: 500; display: flex; flex-direction: column; margin: 0; box-shadow: var(--shadow-lg); }
     .gantt-expanded-open { overflow: hidden; }
-    .gantt-toolbar { padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--bg-card); }
+    .gantt-toolbar, .task-table-toolbar { padding: 18px 24px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--bg-card); }
     .gantt-scroll-area { position: relative; overflow: auto; max-height: calc(100vh - 170px); min-height: 240px; }
-    .gantt-expanded .gantt-scroll-area { flex: 1; min-height: 0; max-height: none; overflow: auto; }
+    .gantt-expanded .gantt-scroll-area { flex: 1; min-height: 0; max-height: none; }
+    /* hide the table's own horizontal bar; the custom bar below covers the timeline column only */
+    .gantt-scroll-area::-webkit-scrollbar:horizontal { height: 0; }
+    .gantt-hscroll { overflow-x: auto; overflow-y: hidden; height: 14px; margin-left: 320px; border-top: 1px solid var(--border-color); background: var(--bg-band); flex-shrink: 0; }
+    .gantt-hscroll > div { height: 1px; }
+    .gantt-hscroll::-webkit-scrollbar { height: 10px; }
+    .gantt-hscroll::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 6px; border: 2px solid var(--bg-band); }
+    .gantt-hscroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    .gantt-hscroll.hidden { display: none; }
     /* separate borders: collapsed borders disappear from sticky cells while scrolling */
     .gantt-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 900px; }
-    .gantt-table th, .gantt-table td { border: 0; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 6px 8px; font-size: 0.8rem; }
-    .gantt-task-col { width: 320px; min-width: 300px; max-width: 320px; position: sticky; left: 0; background: var(--bg-card); z-index: 20; box-shadow: 2px 0 5px rgba(0,0,0,0.06); }
+    .gantt-table th, .gantt-table td { border: 0; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 6px 10px; font-size: 0.8rem; }
+    .gantt-task-col { width: 320px; min-width: 300px; max-width: 320px; position: sticky; left: 0; background: var(--bg-card); z-index: 20; box-shadow: 4px 0 8px -6px rgba(0,0,0,0.12); text-align: left; }
     /* sticky must be on the th cells (sticky on <tr> is unreliable) */
-    .gantt-header-row th { position: sticky; top: 0; z-index: 30; background: var(--bg-subtle); box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
-    /* Frozen task header sits above every scrolling month/day header cell. */
-    .gantt-header-row th.gantt-task-col { left: 0; z-index: 40; background: var(--bg-card); }
+    .gantt-header-row th { position: sticky; top: 0; z-index: 30; background: var(--bg-band); font-weight: 500; color: var(--text-muted); box-shadow: 0 4px 8px -6px rgba(0,0,0,0.15); }
+    .gantt-header-row th.gantt-task-col { left: 0; z-index: 40; background: var(--bg-band); }
     .gantt-header-track { display: grid; grid-auto-columns: 28px; grid-auto-flow: column; width: max-content; min-width: 100%; }
     .gantt-header-track > div { min-width: 28px; text-align: center; border-right: 1px solid var(--border-color); padding: 3px 0; }
-    .gantt-header-track.months > div { white-space: nowrap; padding: 4px 8px; }
-    .gantt-timeline-cell { padding: 0 !important; position: relative; height: 38px; vertical-align: middle; }
+    .gantt-header-track.months > div { white-space: nowrap; padding: 5px 8px; color: var(--text-main); font-weight: 500; }
+    .gantt-timeline-cell { padding: 0 !important; position: relative; height: 46px; vertical-align: middle; }
     .gantt-status-cell { position: relative; }
-    .gantt-status-line { position: absolute; z-index: 5; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #f87171, #dc2626); box-shadow: 0 0 0 1px rgba(255,255,255,.85), 0 0 7px rgba(220,38,38,.55); pointer-events: none; }
+    .gantt-status-line { position: absolute; z-index: 5; top: 0; bottom: 0; width: 2px; background: var(--cutoff-color); opacity: 0.85; pointer-events: none; }
     .gantt-bar-container { position: relative; height: 24px; margin: 2px 0; }
-    .gantt-planned-bar { position: absolute; top: 2px; height: 18px; background-color: #e0e7ff; border: 1px solid #a5b4fc; border-radius: 4px; z-index: 1; opacity: 0.85; }
-    [data-theme="dark"] .gantt-planned-bar { background-color: #312e81; border-color: #4f46e5; }
-    .gantt-actual-bar { position: absolute; top: 5px; height: 12px; background: linear-gradient(90deg, #10b981, #059669); border-radius: 3px; z-index: 2; box-shadow: 0 1px 3px rgba(16, 185, 129, 0.4); }
+    .gantt-planned-bar { position: absolute; top: 3px; height: 18px; background-color: var(--bg-subtle); border: 1px solid var(--border-strong); border-radius: var(--radius-pill); z-index: 1; }
+    .gantt-actual-bar { position: absolute; top: 3px; height: 18px; background: var(--accent); border-radius: var(--radius-pill); z-index: 2; }
+    .category-row td { background-color: var(--bg-band) !important; font-weight: 600; color: var(--text-main); }
 
-    /* Task Management Table (Fixed layout for flexible shrinking) */
-    .task-table-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 24px; }
-    .task-table-toolbar { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    /* ---------- Task table ---------- */
+    .task-table-wrapper { overflow: hidden; }
     .search-filter-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1; }
-    .search-input { padding: 8px 12px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-main); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.85rem; min-width: 220px; outline: none; }
-    .search-input:focus { border-color: var(--primary); }
-    .filter-select { padding: 8px 12px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-main); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer; }
+    .search-input, .filter-select { padding: 8px 16px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main); border-radius: var(--radius-pill); font-family: inherit; font-size: 0.84rem; outline: none; transition: border-color 0.15s; }
+    .search-input { min-width: 240px; padding-left: 38px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239aa1a9' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 14px center; }
+    .filter-select { cursor: pointer; padding-right: 32px; }
+    .search-input:focus, .filter-select:focus { border-color: var(--text-main); }
 
     .task-table-responsive { overflow-x: auto; max-height: 720px; position: relative; }
     .task-table { width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; }
-    .task-table th { background: var(--bg-subtle); color: var(--text-muted); font-weight: 600; font-size: 0.8rem; padding: 12px 12px; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .task-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
-    .task-table tr:hover { background-color: var(--bg-subtle); }
-    .category-row { background-color: var(--bg-subtle) !important; font-weight: 600; color: var(--primary); }
+    .task-table th { background: var(--bg-band); color: var(--text-muted); font-weight: 500; font-size: 0.78rem; padding: 13px 12px; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 10; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-table td { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 0.86rem; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
+    .task-table tbody tr { transition: background 0.12s; }
+    .task-table tbody tr:hover { background-color: var(--bg-subtle); }
+    .task-table input[type="checkbox"], .gantt-table input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; }
+    .table-tip { padding: 12px 24px; font-size: 0.76rem; color: var(--text-muted); background: var(--bg-band); display: flex; align-items: center; gap: 8px; }
 
-    .progress-slider-cell { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    .progress-slider { flex: 1; min-width: 0; width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: var(--border-color); border-radius: 3px; outline: none; cursor: pointer; }
-    .progress-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    .progress-slider-cell { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .progress-slider { flex: 1; min-width: 0; width: 100%; height: 4px; -webkit-appearance: none; appearance: none; background: var(--border-color); border-radius: 3px; outline: none; cursor: pointer; accent-color: var(--accent); }
+    .progress-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--bg-card); border: 3px solid var(--accent); cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+    .progress-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--bg-card); border: 3px solid var(--accent); cursor: pointer; }
     .progress-pct-badge { font-weight: 600; font-size: 0.8rem; min-width: 40px; flex-shrink: 0; text-align: right; }
 
-    /* =========================================
-       Column Resizer CSS
-       ========================================= */
-    /* th is already position:sticky (a positioned element), so the resizer anchors to it
-       without overriding sticky — the old `position: relative` here broke the frozen header. */
-    .task-table th .resizer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 5px;
-      cursor: col-resize;
-      user-select: none;
-      height: 100%;
-      z-index: 1;
-      background: transparent;
-      transition: background 0.2s;
-    }
-    .task-table th .resizer:hover, .task-table th .resizer.resizing {
-      background-color: var(--primary);
-      opacity: 0.8;
-    }
+    /* th is already position:sticky (a positioned element), so the resizer anchors to it */
+    .task-table th .resizer { position: absolute; top: 0; right: 0; width: 5px; cursor: col-resize; user-select: none; height: 100%; z-index: 1; background: transparent; transition: background 0.2s; }
+    .task-table th .resizer:hover, .task-table th .resizer.resizing { background-color: var(--accent); }
 
-    /* =========================================
-       Task Drag and Drop CSS
-       ========================================= */
-    tr.task-row-item { transition: background 0.15s ease, opacity 0.15s ease; }
-    tr.task-row-item.dragging { opacity: 0.4; background: var(--bg-subtle) !important; }
-    tr.task-row-item.drag-over { border-top: 3px solid var(--primary) !important; background: rgba(37, 99, 235, 0.06) !important; }
+    tr.task-row-item.dragging { opacity: 0.4; }
+    tr.task-row-item.drag-over { box-shadow: inset 0 3px 0 var(--accent); background: var(--accent-subtle) !important; }
+    .drag-handle { color: var(--text-subtle); cursor: grab; padding: 6px 4px !important; text-align: center; user-select: none; }
+    .drag-handle:hover { color: var(--text-main); }
+    .drag-handle:active { cursor: grabbing; color: var(--accent); }
 
-    .drag-handle {
-      font-size: 1.15rem; letter-spacing: -2px; color: var(--text-muted);
-      cursor: grab; padding: 6px 4px !important; text-align: center; user-select: none;
-    }
-    .drag-handle:active { cursor: grabbing; color: var(--primary); }
-
-    /* Modal Styles */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    /* ---------- Modals ---------- */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(23, 28, 34, 0.55); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
     .modal-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); transform: translateY(12px) scale(0.98); transition: all 0.2s ease; }
-    .modal-overlay.open .modal-card { transform: translateY(0) scale(1); }
-    .modal-header { padding: 16px 22px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
-    .modal-header h3 { font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .modal-body { padding: 20px 22px; }
-    .modal-footer { padding: 14px 22px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: var(--bg-subtle); }
+    .modal-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); transform: translateY(14px); transition: transform 0.22s ease; }
+    .modal-overlay.open .modal-card { transform: translateY(0); }
+    .modal-header { padding: 20px 26px 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .modal-header h3 { font-family: var(--font-display); font-size: 1.25rem; font-weight: 400; display: flex; align-items: center; gap: 10px; }
+    .modal-header h3::before { content: ""; width: 4px; height: 20px; background: var(--accent); border-radius: 2px; flex-shrink: 0; }
+    .modal-body { padding: 22px 26px; }
+    .modal-footer { padding: 16px 26px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+    .modal-section { margin-top: 18px; padding: 16px 18px; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    .modal-section-title { font-size: 0.72rem; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 12px; }
     .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-main); }
-    .form-control { width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--bg-body); color: var(--text-main); font-family: inherit; font-size: 0.88rem; outline: none; }
-    .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-subtle); }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 6px; color: var(--text-main); }
+    .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-main); font-family: inherit; font-size: 0.9rem; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-subtle); }
+    [data-theme="dark"] .form-control { color-scheme: dark; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .form-control:disabled { background: var(--bg-subtle); color: var(--text-muted); cursor: not-allowed; }
-    .form-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
-    .legend-item.off { opacity: 0.35; text-decoration: line-through; }
+    .form-control:disabled, .form-control[readonly] { background: var(--bg-subtle); color: var(--text-muted); cursor: not-allowed; }
+    .form-hint { font-size: 0.74rem; color: var(--text-muted); margin-top: 5px; }
 
-    /* Toast Notification */
-    .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #ffffff; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 500; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); z-index: 300; }
+    /* ---------- Toast / footer ---------- */
+    .toast { position: fixed; bottom: 26px; right: 26px; background: #2b333d; color: #ffffff; padding: 13px 20px 13px 18px; border-radius: var(--radius-pill); font-size: 0.86rem; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; transform: translateY(100px); opacity: 0; transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1); z-index: 300; }
+    .toast::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
     .toast.show { transform: translateY(0); opacity: 1; }
+    footer.site-footer { border-top: 1px solid var(--border-color); padding: 22px 0; font-size: 0.78rem; color: var(--text-subtle); }
+    footer.site-footer .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 
-    /* Print Styles */
+    /* ---------- Print / responsive ---------- */
     @media print {
-      header, .tab-bar, .chart-controls, .btn, .status-date-badge input, .search-filter-group, .task-actions-col, #th-select-all, .task-checkbox { display: none !important; }
+      header.site-header, .chart-controls, .btn, .status-date-badge, .search-filter-group, .task-actions-col, #th-select-all, .task-checkbox, footer.site-footer { display: none !important; }
+      .tab-content { display: block !important; }
       body { background: white !important; color: black !important; }
-      .container { max-width: 100% !important; padding: 0 !important; }
-      .kpi-card, .chart-panel, .gantt-wrapper, .task-table-wrapper { box-shadow: none !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
+      .container { max-width: 100% !important; padding: 0 12px !important; }
+      .chart-panel, .gantt-wrapper, .task-table-wrapper, .variance-table-card { page-break-inside: avoid; }
       .canvas-container { height: 380px !important; }
     }
+    @media (max-width: 1180px) {
+      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .kpi-card:nth-child(4)::before { display: none; }
+      .header-content { flex-wrap: wrap; height: auto; padding: 10px 0 0; gap: 8px 20px; }
+      .tab-bar { order: 3; width: 100%; height: 46px; }
+    }
     @media (max-width: 768px) {
-      .header-content { flex-direction: column; align-items: flex-start; }
-      .header-right { width: 100%; justify-content: space-between; }
+      .container { padding: 0 16px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 24px; padding-top: 32px; padding-bottom: 32px; }
+      .hero-progress { text-align: left; padding-left: 0; }
+      .hero-progress::before { display: none; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .kpi-card::before { display: none; }
       .form-row { grid-template-columns: 1fr; }
       .canvas-container { height: 320px; }
+      .status-date-badge label { display: none; }
+      .perf-box { border-left: none; padding: 10px 0; }
     }
   </style>
 </head>
-<body data-theme="light">
+<body data-theme="light" data-tab="tab-scurve">
 
-  <header>
+  <header class="site-header">
     <div class="container">
       <div class="header-content">
-        <div class="header-left">
-          <div class="brand-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+        <a class="brand" href="#" onclick="switchTab('tab-scurve'); return false;" title="หน้าแรก">
+          <span class="brand-mark">
+            <svg viewBox="0 0 34 34" width="34" height="34" fill="none" stroke-linecap="round">
+              <path d="M5 27 C 14 27, 15 8, 29 7" stroke="currentColor" stroke-width="2.6"/>
+              <path d="M5 30 H 29" stroke="currentColor" stroke-width="1.4" opacity=".35"/>
+              <circle cx="29" cy="7" r="3.2" fill="#f7a400" stroke="none"/>
             </svg>
-          </div>
-          <div class="project-title-box">
-            <h1 id="lbl-project-name">PVCell Project
-            </h1>
-            <p>
-              <span>ผู้รับผิดชอบหลัก: <strong id="lbl-project-lead" style="color:var(--text-main);">STeP & TSUS</strong></span>
-              <span>•</span>
-              <span id="lbl-project-date-range">2024-07-25 ถึง 2025-01-19</span>
-            </p>
-          </div>
-        </div>
+          </span>
+          <span class="brand-name">S-Curve Planner<small>Project Tracking</small></span>
+        </a>
+
+        <nav class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab('tab-scurve')">ภาพรวม S-Curve</button>
+          <button class="tab-btn" onclick="switchTab('tab-gantt')">แผนภูมิแกนต์</button>
+          <button class="tab-btn" onclick="switchTab('tab-tasks')">รายการงาน <span class="tab-count" id="tab-task-count">0</span></button>
+          <button class="tab-btn" onclick="switchTab('tab-manpower')">บันทึกหน้างาน</button>
+        </nav>
 
         <div class="header-right">
           <div class="status-date-badge" title="กำหนดวันประเมินผลความคืบหน้า (As-of Date)">
-            <label for="status-date-input">วันประเมินผล:</label>
+            <label for="status-date-input">วันประเมินผล</label>
             <input type="date" id="status-date-input" onchange="onStatusDateChange(this.value)">
             <button class="btn btn-secondary btn-sm" onclick="onStatusDateChange(formatDate(today()))" title="ตั้งวันประเมินผลเป็นวันนี้">วันนี้</button>
           </div>
-          <button class="btn btn-primary" onclick="openTaskModal(null)">เพิ่มงานใหม่</button>
-          <button class="btn-icon" onclick="toggleTheme()" id="theme-toggle-btn" title="เปลี่ยนธีม สว่าง/มืด">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <button class="btn btn-primary" onclick="openTaskModal(null)"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>เพิ่มงาน</button>
+          <button class="btn-icon" onclick="toggleTheme()" id="theme-toggle-btn" title="เปลี่ยนธีม สว่าง/มืด" aria-label="เปลี่ยนธีม">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
           </button>
           <button class="btn-icon" onclick="openProjectSettingsModal()" id="project-settings-btn" title="ตั้งค่าข้อมูลโครงการ" aria-label="ตั้งค่าข้อมูลโครงการ">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 2.94-.08-.02a1.7 1.7 0 0 0-1.78.72l-.04.07h-3.4l-.04-.07a1.7 1.7 0 0 0-1.78-.72l-.08.02-1.7-2.94.06-.06A1.7 1.7 0 0 0 9.6 15l-.08-.05v-3.4l.08-.05a1.7 1.7 0 0 0-.34-1.88L9.2 9.56l1.7-2.94.08.02a1.7 1.7 0 0 0 1.78-.72l.04-.07h3.4l.04.07a1.7 1.7 0 0 0 1.78.72l.08-.02 1.7 2.94-.06.06A1.7 1.7 0 0 0 19.4 11l.08.05v3.4z"/></svg>
+            <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
           </button>
         </div>
       </div>
     </div>
   </header>
 
-  <main class="container" style="flex: 1; padding-top: 10px; padding-bottom: 40px;">
-    <!-- KPI Summary Row -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-card-header"><span class="kpi-title">ระยะเวลาโครงการ</span><div class="kpi-icon blue">⏱️</div></div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <div>
+        <div class="hero-eyebrow">Project Dashboard</div>
+        <h1 id="lbl-project-name">PVCell Project</h1>
+        <div class="hero-meta">
+          <span><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>ผู้รับผิดชอบหลัก <strong id="lbl-project-lead">STeP & TSUS</strong></span>
+          <span><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span id="lbl-project-date-range">-</span></span>
+        </div>
+      </div>
+      <div class="hero-progress">
+        <div class="label">ความคืบหน้าจริง ณ วันประเมินผล</div>
+        <div class="big" id="hero-actual">0.0<small>%</small></div>
+        <div class="sub" id="hero-sub">แผนงาน 0.0%</div>
+        <div class="hero-bar" title="แถบสีส้ม = ทำจริง, ขีดดำ = ตามแผน"><i id="hero-bar-actual" style="width:0%"></i><b id="hero-bar-plan" style="left:0%"></b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPI BAND -->
+  <section class="kpi-band">
+    <div class="container kpi-grid">
+      <div class="kpi-card k-time" style="--kc:#3d7bd9">
+        <div class="kpi-icon"><svg viewBox="0 0 48 48"><circle cx="24" cy="26" r="16"/><path d="M24 16v10l7 5"/><path class="hl" d="M19 6h10M24 6v4"/></svg></div>
         <div class="kpi-value" id="kpi-days-elapsed">0 <span class="unit">/ 0 วัน</span></div>
-        <div class="kpi-footer">เริ่มงานไปแล้ว <strong id="kpi-time-pct" style="color:var(--primary);">0.0%</strong></div>
+        <div class="kpi-meter"><i id="kpi-bar-time"></i></div>
+        <div class="kpi-title">ระยะเวลาโครงการ</div>
+        <div class="kpi-footer">ผ่านไปแล้ว <strong id="kpi-time-pct">0.0%</strong></div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-card-header"><span class="kpi-title">แผนงานสะสม (Planned)</span><div class="kpi-icon cyan">📅</div></div>
+      <div class="kpi-card k-plan" style="--kc:#14a3a3">
+        <div class="kpi-icon"><svg viewBox="0 0 48 48"><rect x="7" y="10" width="34" height="31" rx="4"/><path d="M7 19h34M16 6v8M32 6v8"/><path class="hl" d="M15 31l6 4 12-9"/></svg></div>
         <div class="kpi-value" id="kpi-planned-pct">0.0 <span class="unit">%</span></div>
-        <div class="kpi-footer">เป้าหมายตามแผนงาน</div>
+        <div class="kpi-meter"><i id="kpi-bar-plan"></i></div>
+        <div class="kpi-title">แผนงานสะสม</div>
+        <div class="kpi-footer">เป้าหมาย ณ วันประเมิน</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-card-header"><span class="kpi-title">งานจริงสะสม (Actual)</span><div class="kpi-icon green">✅</div></div>
+      <div class="kpi-card k-actual" style="--kc:#f7a400">
+        <div class="kpi-icon"><svg viewBox="0 0 48 48"><path d="M6 40h36"/><path d="M10 34c8 0 10-22 28-24"/><circle class="hl" cx="38" cy="10" r="3"/></svg></div>
         <div class="kpi-value" id="kpi-actual-pct">0.0 <span class="unit">%</span></div>
-        <div class="kpi-footer">ผลงานที่ส่งมอบและทำได้จริง</div>
+        <div class="kpi-meter"><i id="kpi-bar-actual"></i></div>
+        <div class="kpi-title">งานจริงสะสม</div>
+        <div class="kpi-footer">ผลงานที่ทำได้จริง</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-card-header"><span class="kpi-title">มูลค่างานสะสม (บาท)</span><div class="kpi-icon amber">💰</div></div>
+      <div class="kpi-card k-value" style="--kc:#2e9e6b">
+        <div class="kpi-icon"><svg viewBox="0 0 48 48"><ellipse cx="20" cy="14" rx="12" ry="5"/><path d="M8 14v8c0 2.8 5.4 5 12 5s12-2.2 12-5v-8"/><path d="M8 22v8c0 2.8 5.4 5 12 5"/><circle class="hl" cx="34" cy="33" r="8"/><path class="hl" d="M34 29v8"/></svg></div>
         <div class="kpi-value" id="kpi-actual-value">0.00 <span class="unit">บาท</span></div>
+        <div class="kpi-meter"><i id="kpi-bar-value"></i></div>
+        <div class="kpi-title">มูลค่างานสะสม</div>
         <div class="kpi-footer" id="kpi-actual-value-total">จากมูลค่างานทั้งหมด: -</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-card-header"><span class="kpi-title">สถานะความก้าวหน้า (SV)</span><div class="kpi-icon amber">📉</div></div>
+      <div class="kpi-card k-sv" id="kpi-card-sv" style="--kc:#f7a400">
+        <div class="kpi-icon"><svg viewBox="0 0 48 48"><path d="M6 38l12-12 8 8 16-16"/><path class="hl" d="M32 18h10v10"/></svg></div>
         <div class="kpi-value" id="kpi-variance-val">0.0 <span class="unit">%</span></div>
-        <div class="kpi-footer"><span id="kpi-variance-badge" class="badge badge-success">ตรงตามแผนงาน</span><span id="kpi-days-variance" style="margin-left:auto; font-weight:600;">0 วัน</span></div>
+        <div class="kpi-title">ผลต่างจากแผน (SV)</div>
+        <div class="kpi-footer"><span id="kpi-variance-badge" class="badge badge-success">ตรงตามแผนงาน</span><span id="kpi-days-variance">0 วัน</span></div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-card-header"><span class="kpi-title">กำลังคนหน้างาน</span><div class="kpi-icon purple">👷</div></div>
+      <div class="kpi-card k-crew" style="--kc:#8b5cf6">
+        <div class="kpi-icon"><svg viewBox="0 0 48 48"><circle cx="17" cy="17" r="6"/><path d="M5 40c1.5-7 6-11 12-11s10.5 4 12 11"/><circle class="hl" cx="33" cy="15" r="5"/><path class="hl" d="M31 26c5 0 10 3 12 10"/></svg></div>
         <div class="kpi-value" id="kpi-manpower-total">0 <span class="unit">Man-days</span></div>
-        <div class="kpi-footer">เฉลี่ย: <strong id="kpi-manpower-avg">0</strong> คน/วัน <span style="margin-left:auto;">สูงสุด: <strong id="kpi-manpower-max">0</strong> คน</span></div>
+        <div class="kpi-title">กำลังคนหน้างาน</div>
+        <div class="kpi-footer">เฉลี่ย <strong id="kpi-manpower-avg">0</strong> คน/วัน · สูงสุด <strong id="kpi-manpower-max">0</strong> คน</div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Navigation Tabs -->
-    <nav class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('tab-scurve')">📈 กราฟ S-Curve & ตัวชี้วัด</button>
-      <button class="tab-btn" onclick="switchTab('tab-gantt')">📊 แผนภูมิแกนต์ (Gantt Chart)</button>
-      <button class="tab-btn" onclick="switchTab('tab-tasks')">📋 รายการงานทั้งหมด (<span id="tab-task-count">0</span>)</button>
-      <button class="tab-btn" onclick="switchTab('tab-manpower')">👷 บันทึกคนงาน & งานประจำวัน</button>
-    </nav>
+  <main class="container page">
 
     <!-- TAB 1: S-CURVE & METRICS -->
     <section id="tab-scurve" class="tab-content active">
       <div class="chart-panel">
         <div class="chart-panel-header">
           <div class="chart-title-area">
-            <h2>กราฟเปรียบเทียบความก้าวหน้าโครงการ (Project S-Curve)</h2>
+            <h2>ความก้าวหน้าโครงการ (S-Curve)</h2>
             <p>เปรียบเทียบผลงานสะสมตามแผนงาน (Planned) และผลงานทำได้จริง (Actual) พร้อมเส้นคาดการณ์ (Forecast)</p>
           </div>
           <div class="chart-controls">
@@ -407,7 +498,7 @@
         </div>
       </div>
       <div class="variance-table-card">
-        <h3>การวิเคราะห์ประสิทธิภาพงานเชิงวิศวกรรม (Earned Value & Schedule Performance)</h3>
+        <h3 class="section-title">การวิเคราะห์ประสิทธิภาพงาน <span style="font-size:.8rem;color:var(--text-muted);font-weight:400;">Earned Value & Schedule Performance</span></h3>
         <div class="perf-grid">
           <div class="perf-box"><div class="perf-box-title">SCHEDULE VARIANCE (SV)</div><div class="perf-box-desc" id="perf-sv-desc">-</div></div>
           <div class="perf-box"><div class="perf-box-title">SCHEDULE PERFORMANCE (SPI)</div><div class="perf-box-desc" id="perf-spi-desc">-</div></div>
@@ -421,13 +512,13 @@
       <div class="gantt-wrapper">
         <div class="gantt-toolbar">
           <div style="display:flex; align-items:center; gap:12px;">
-            <h3 style="font-size:1.05rem; font-weight:600;">แผนภูมิแกนต์และไทม์ไลน์โครงการ</h3>
+            <h3 class="section-title">แผนภูมิแกนต์และไทม์ไลน์โครงการ</h3>
             <span class="badge badge-info" id="gantt-item-count">0 รายการ</span>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             <select id="gantt-category-filter" class="filter-select" onchange="renderGantt()"><option value="ALL">ทุกหมวดหมู่งาน</option></select>
             <button class="btn btn-secondary btn-sm" onclick="scrollGanttToToday()">ไปที่วันประเมิน</button>
-            <button class="btn btn-secondary btn-sm" id="gantt-expand-btn" onclick="toggleGanttExpanded()" aria-pressed="false">⛶ ขยาย</button>
+            <button class="btn btn-secondary btn-sm" id="gantt-expand-btn" onclick="toggleGanttExpanded()" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>ขยาย</button>
           </div>
         </div>
         <div class="gantt-scroll-area" id="gantt-scroll-container">
@@ -436,6 +527,8 @@
             <tbody id="gantt-tbody"></tbody>
           </table>
         </div>
+        <!-- horizontal scrollbar that spans only the timeline column -->
+        <div class="gantt-hscroll" id="gantt-hscroll"><div id="gantt-hscroll-inner"></div></div>
       </div>
     </section>
 
@@ -444,7 +537,7 @@
       <div class="task-table-wrapper">
         <div class="task-table-toolbar">
           <div class="search-filter-group">
-            <input type="text" id="task-search-input" class="search-input" placeholder="🔍 ค้นหาชื่องาน หรือผู้รับผิดชอบ..." oninput="filterTasks()">
+            <input type="text" id="task-search-input" class="search-input" placeholder="ค้นหาชื่องาน ผู้รับผิดชอบ หรือหมายเหตุ" oninput="filterTasks()">
             <select id="task-category-filter" class="filter-select" onchange="filterTasks()"><option value="ALL">ทุกหมวดหมู่งาน (All Categories)</option></select>
             <select id="task-status-filter" class="filter-select" onchange="filterTasks()">
               <option value="ALL">ทุกสถานะ (All Statuses)</option>
@@ -457,8 +550,8 @@
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm task-selection-action" id="btn-select-all-tasks" onclick="selectAllTasks()" style="display:none;" title="เลือกงานทั้งหมด">เลือกทั้งหมด</button>
             <button class="btn btn-danger btn-sm" id="btn-batch-delete" onclick="deleteSelectedTasks()" style="display:none;" title="ลบรายการงานที่เลือก">ลบที่เลือก (<span id="batch-delete-count">0</span>)</button>
-            <button class="btn btn-secondary btn-sm" onclick="openCategoryManager()">☷ หมวดหมู่ทั้งหมด</button>
-            <button class="btn btn-primary btn-sm" onclick="openTaskModal(null)">เพิ่มงานใหม่</button>
+            <button class="btn btn-secondary btn-sm" onclick="openCategoryManager()"><svg class="ic" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>หมวดหมู่</button>
+            <button class="btn btn-primary btn-sm" onclick="openTaskModal(null)"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>เพิ่มงานใหม่</button>
           </div>
         </div>
 
@@ -466,21 +559,21 @@
           <table class="task-table" id="task-list-table">
             <thead>
               <tr>
-                <th style="width: 40px; text-align:center;" title="คลิกที่ไอคอนหน้าแถวค้างไว้เพื่อลากสลับลำดับ">ย้าย</th>
+                <th style="width: 36px; text-align:center;" title="คลิกที่ไอคอนหน้าแถวค้างไว้เพื่อลากสลับลำดับ"></th>
                 <th style="width: 40px; text-align:center;">
                   <input type="checkbox" id="th-select-all" onchange="toggleSelectAllTasks(this.checked)" title="เลือกทั้งหมด">
                 </th>
-                <th style="width: 50px; text-align:center;">ลำดับ</th>
-                <th style="width: 120px;">หมวดหมู่</th>
-                <th style="width: 220px;">รายการงาน</th>
-                <th style="width: 100px;">ผู้รับผิดชอบ</th>
-                <th style="width: 130px;">แผน: เริ่ม - จบ</th>
-                <th style="width: 75px; text-align:center;">ระยะเวลา</th>
-                <th style="width: 130px;">ทำจริง: เริ่ม - จบ</th>
-                <th style="width: 180px;">ความคืบหน้าจริง (% Actual)</th>
-                <th style="width: 85px; text-align:right;">น้ำหนัก</th>
-                <th style="width: 170px; text-align:right;">มูลค่างาน (บาท)</th>
-                <th style="width: 100px; text-align:center;">สถานะ</th>
+                <th style="width: 44px; text-align:center;">#</th>
+                <th style="width: 105px;">หมวดหมู่</th>
+                <th style="width: 175px;">รายการงาน</th>
+                <th style="width: 105px;">ผู้รับผิดชอบ</th>
+                <th style="width: 115px;">แผน: เริ่ม - จบ</th>
+                <th style="width: 70px; text-align:center;">วัน</th>
+                <th style="width: 115px;">ทำจริง: เริ่ม - จบ</th>
+                <th style="width: 165px;">ความคืบหน้าจริง</th>
+                <th style="width: 80px; text-align:right;">น้ำหนัก</th>
+                <th style="width: 130px; text-align:right;">มูลค่างาน (บาท)</th>
+                <th style="width: 112px; text-align:center;">สถานะ</th>
                 <th class="task-actions-col" style="text-align:center; width:80px;">จัดการ</th>
               </tr>
             </thead>
@@ -489,8 +582,7 @@
             </tbody>
           </table>
         </div>
-        <div style="padding:10px 20px; font-size:0.75rem; color:var(--text-muted); background:var(--bg-subtle);">
-          💡 <strong>เคล็ดลับ:</strong> นำเมาส์ไปชี้ที่ขอบขวาของหัวคอลัมน์เพื่อลากปรับความกว้าง | คลิกค้างที่ไอคอน ⋮⋮ หน้าแถวแล้วลากเพื่อสลับลำดับงาน (ช่องที่ถูกย่อจะแสดงข้อความย่อส่วนเกินอัตโนมัติ)
+        <div class="table-tip"><svg class="ic" viewBox="0 0 24 24" style="color:var(--accent)"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></svg> <strong>เคล็ดลับ:</strong> นำเมาส์ไปชี้ที่ขอบขวาของหัวคอลัมน์เพื่อลากปรับความกว้าง | คลิกค้างที่ไอคอน ⋮⋮ หน้าแถวแล้วลากเพื่อสลับลำดับงาน (ช่องที่ถูกย่อจะแสดงข้อความย่อส่วนเกินอัตโนมัติ)
         </div>
       </div>
     </section>
@@ -499,14 +591,14 @@
     <section id="tab-manpower" class="tab-content">
       <div class="chart-panel" style="margin-bottom: 20px;">
         <div class="chart-panel-header">
-          <div class="chart-title-area"><h2>กราฟจำนวนผู้เข้าปฏิบัติงานหน้างาน (Daily Site Headcount)</h2></div>
-          <div><button class="btn btn-primary btn-sm" onclick="openAddDailyLogModal()">บันทึกคนงานประจำวัน</button></div>
+          <div class="chart-title-area"><h2>จำนวนผู้เข้าปฏิบัติงานหน้างาน</h2><p>Daily Site Headcount</p></div>
+          <div><button class="btn btn-primary btn-sm" onclick="openAddDailyLogModal()"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>บันทึกคนงานประจำวัน</button></div>
         </div>
         <div class="canvas-container" style="height: 280px;"><canvas id="manpower-canvas"></canvas></div>
       </div>
       <div class="task-table-wrapper">
         <div class="task-table-toolbar">
-          <h3 style="font-size:1.05rem; font-weight:600;">บันทึกรายงานหน้างานประจำวัน (Site Daily Logs)</h3>
+          <h3 class="section-title">บันทึกรายงานหน้างานประจำวัน <span style="font-size:.8rem;color:var(--text-muted);font-weight:400;">Site Daily Logs</span></h3>
           <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" id="btn-select-all-logs" onclick="selectAllLogs()" style="display:none;">เลือกทั้งหมด</button>
             <button class="btn btn-danger btn-sm" id="btn-delete-logs" onclick="deleteSelectedLogs()" style="display:none;">ลบที่เลือก (<span id="log-delete-count">0</span>)</button>
@@ -569,7 +661,7 @@
   <!-- MODAL: CATEGORY MANAGER -->
   <div class="modal-overlay" id="category-manager-modal">
     <div class="modal-card" style="max-width:620px;">
-      <div class="modal-header"><h3>☷ จัดการหมวดหมู่งาน</h3><button class="btn-icon btn-sm" onclick="closeCategoryManager()" aria-label="ปิด">✕</button></div>
+      <div class="modal-header"><h3>จัดการหมวดหมู่งาน</h3><button class="btn-icon btn-sm" onclick="closeCategoryManager()" aria-label="ปิด">✕</button></div>
       <div class="modal-body">
         <div style="display:flex; gap:8px; margin-bottom:18px;">
           <input type="text" id="new-category-name" class="form-control" placeholder="ชื่อหมวดหมู่ใหม่" onkeydown="if(event.key==='Enter') addManagedCategory()">
@@ -584,7 +676,7 @@
   <!-- MODAL: PROJECT SETTINGS -->
   <div class="modal-overlay" id="project-modal">
     <div class="modal-card">
-      <div class="modal-header"><h3>⚙️ ตั้งค่าข้อมูลโครงการ</h3><button class="btn-icon btn-sm" onclick="closeProjectSettingsModal()">✕</button></div>
+      <div class="modal-header"><h3>ตั้งค่าข้อมูลโครงการ</h3><button class="btn-icon btn-sm" onclick="closeProjectSettingsModal()">✕</button></div>
       <div class="modal-body">
         <div class="form-group"><label>ชื่อโครงการ (Project Name) *</label><input type="text" id="cfg-project-name" class="form-control" required></div>
         <div class="form-group"><label>ผู้รับผิดชอบหลัก / บริษัท *</label><input type="text" id="cfg-project-lead" class="form-control" required></div>
@@ -600,8 +692,8 @@
             <option value="manual">กำหนดเองอิสระในแต่ละรายการงาน (Manual Weight %)</option>
           </select>
         </div>
-        <div style="margin-top:20px; padding:12px; background:var(--bg-subtle); border-radius:var(--radius-sm);">
-          <div style="font-weight:600; margin-bottom:10px;">📦 นำเข้า / ส่งออกข้อมูล:</div>
+        <div class="modal-section">
+          <div class="modal-section-title">นำเข้า / ส่งออกข้อมูล</div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" onclick="exportDataJSON()" title="สำรองข้อมูลเป็น JSON">ส่งออก JSON</button>
             <button class="btn btn-secondary btn-sm" onclick="triggerImportJSON()" title="นำเข้าข้อมูลจาก JSON">นำเข้า JSON</button>
@@ -611,9 +703,9 @@
             <input type="file" id="csv-file-input" style="display:none;" accept=".csv,text/csv" onchange="importTasksCSV(event)">
           </div>
         </div>
-        <div style="margin-top:20px; padding:12px; background:var(--bg-subtle); border-radius:var(--radius-sm); font-size:0.82rem;">
-          <div style="font-weight:600; margin-bottom:6px;">🛠️ จัดการข้อมูลโครงการ:</div>
-          <button class="btn btn-secondary btn-sm" onclick="resetToSampleData()">🔄 กู้คืนตัวอย่าง PVCell Project</button>
+        <div class="modal-section">
+          <div class="modal-section-title">ข้อมูลตัวอย่าง</div>
+          <button class="btn btn-secondary btn-sm" onclick="resetToSampleData()">กู้คืนตัวอย่าง PVCell Project</button>
         </div>
       </div>
       <div class="modal-footer"><button class="btn btn-secondary" onclick="closeProjectSettingsModal()">ยกเลิก</button><button class="btn btn-primary" onclick="saveProjectSettingsModal()">บันทึกการตั้งค่า</button></div>
@@ -636,6 +728,8 @@
       <div class="modal-footer"><button class="btn btn-secondary" onclick="closeDailyLogModal()">ยกเลิก</button><button class="btn btn-primary" onclick="saveDailyLogModal()">บันทึกข้อมูล</button></div>
     </div>
   </div>
+
+  <footer class="site-footer"><div class="container"><span>S-Curve Project Planner · Science and Technology Park, Chiang Mai University</span><span>ข้อมูลบันทึกไว้ในเบราว์เซอร์นี้ — ส่งออก JSON เพื่อสำรองข้อมูล</span></div></footer>
 
   <!-- Toast Notification -->
   <div class="toast" id="toast-msg"><span id="toast-text">บันทึกข้อมูลสำเร็จ</span></div>
@@ -1021,7 +1115,8 @@
 
       const pad = SC_PAD, plotW = W - pad.left - pad.right, plotH = H - pad.top - pad.bottom;
       const isDark = document.body.getAttribute("data-theme") === "dark", gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)", textColor = isDark ? "#94a3b8" : "#64748b";
-      const font = "Prompt, sans-serif";
+      const font = "'IBM Plex Sans Thai', sans-serif";
+      const C = { planned: cssVar("--planned-color") || "#2b333d", actual: cssVar("--actual-color") || "#f7a400", forecast: cssVar("--forecast-color") || "#9aa1a9", cutoff: cssVar("--cutoff-color") || "#d9534f" };
 
       ctx.font = `11px ${font}`; ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.lineWidth = 1;
       for (let yPct = 0; yPct <= 100; yPct += 20) {
@@ -1044,7 +1139,7 @@
         ctx.fillStyle = textColor; ctx.fillText(formatThaiDate(addDays(tl.pStart, i), true), x, pad.top + plotH + 8);
       }
 
-      const drawCurve = (series, pctKey, color, fillGrad, isDashed) => {
+      const drawCurve = (series, pctKey, color, fillGrad, isDashed, width = 3) => {
         if (!series || series.length < 2) return;
         if (fillGrad) {
           ctx.beginPath(); ctx.moveTo(getX(series[0].idx), pad.top + plotH);
@@ -1054,34 +1149,34 @@
         }
         ctx.beginPath();
         series.forEach((pt, i) => { const x = getX(pt.idx), y = getY(pt[pctKey]); if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); });
-        ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.setLineDash(isDashed ? [6, 5] : []); ctx.stroke(); ctx.setLineDash([]);
+        ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineJoin = "round"; ctx.setLineDash(isDashed ? [6, 5] : []); ctx.stroke(); ctx.setLineDash([]);
       };
 
       if (state.chartSettings.showPlanned) {
         const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
-        grad.addColorStop(0, isDark ? "rgba(59,130,246,0.22)" : "rgba(59,130,246,0.12)"); grad.addColorStop(1, "rgba(59,130,246,0)");
+        grad.addColorStop(0, isDark ? "rgba(201,206,212,0.10)" : "rgba(43,51,61,0.07)"); grad.addColorStop(1, "rgba(43,51,61,0)");
         // planned stays at 100% after the planned finish when the axis is extended
         const series = tl.plannedSeries.slice();
         if (maxIdx > series.length - 1 && series.length) series.push({ idx: maxIdx, plannedPct: series[series.length - 1].plannedPct });
-        drawCurve(series, "plannedPct", "#2563eb", grad, false);
+        drawCurve(series, "plannedPct", C.planned, grad, false, 2);
       }
       if (state.chartSettings.showActual) {
         const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
-        grad.addColorStop(0, isDark ? "rgba(16,185,129,0.3)" : "rgba(16,185,129,0.18)"); grad.addColorStop(1, "rgba(16,185,129,0)");
-        drawCurve(tl.actualSeries, "actualPct", "#10b981", grad, false);
+        grad.addColorStop(0, "rgba(247,164,0,0.28)"); grad.addColorStop(1, "rgba(247,164,0,0)");
+        drawCurve(tl.actualSeries, "actualPct", C.actual, grad, false, 3.5);
         const last = tl.actualSeries[tl.actualSeries.length - 1];
-        if (last) { ctx.fillStyle = "#10b981"; ctx.beginPath(); ctx.arc(getX(last.idx), getY(last.actualPct), 5.5, 0, Math.PI * 2); ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = "#fff"; ctx.stroke(); }
+        if (last) { ctx.fillStyle = C.actual; ctx.beginPath(); ctx.arc(getX(last.idx), getY(last.actualPct), 6, 0, Math.PI * 2); ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = cssVar("--bg-card") || "#fff"; ctx.stroke(); }
       }
-      if (state.chartSettings.showForecast) drawCurve(tl.forecastSeries.filter(p => p.idx <= maxIdx), "forecastPct", "#f59e0b", null, true);
+      if (state.chartSettings.showForecast) drawCurve(tl.forecastSeries.filter(p => p.idx <= maxIdx), "forecastPct", C.forecast, null, true, 2);
 
       // Status-date cutoff line (drawn last so it is never hidden by fills)
       const sX = getX(tl.statusIdx);
       if (tl.statusIdx >= 0 && tl.statusIdx <= maxIdx) {
-        ctx.setLineDash([5, 4]); ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(sX, pad.top); ctx.lineTo(sX, pad.top + plotH); ctx.stroke();
+        ctx.setLineDash([4, 4]); ctx.strokeStyle = C.cutoff; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sX, pad.top); ctx.lineTo(sX, pad.top + plotH); ctx.stroke();
         ctx.setLineDash([]);
         const lx = Math.max(pad.left + 45, Math.min(W - 47, sX));
-        ctx.fillStyle = "#ef4444"; ctx.fillRect(lx - 45, pad.top - 20, 90, 18);
-        ctx.fillStyle = "#fff"; ctx.font = `bold 10px ${font}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("วันประเมินผล", lx, pad.top - 11);
+        ctx.fillStyle = C.cutoff; if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(lx - 45, pad.top - 21, 90, 19, 10); ctx.fill(); } else ctx.fillRect(lx - 45, pad.top - 21, 90, 19);
+        ctx.fillStyle = "#fff"; ctx.font = `500 10.5px ${font}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("วันประเมินผล", lx, pad.top - 11);
       }
 
       if (chartHoverInfo && chartHoverInfo.active) {
@@ -1091,9 +1186,9 @@
           ctx.beginPath(); ctx.moveTo(hx, pad.top); ctx.lineTo(hx, pad.top + plotH); ctx.stroke(); ctx.setLineDash([]);
           const pt = chartHoverInfo.point;
           if (pt) {
-            if (state.chartSettings.showPlanned) { ctx.fillStyle = "#2563eb"; ctx.beginPath(); ctx.arc(hx, getY(pt.plannedPct), 4, 0, Math.PI * 2); ctx.fill(); }
-            if (pt.actualPct !== null && state.chartSettings.showActual) { ctx.fillStyle = "#10b981"; ctx.beginPath(); ctx.arc(hx, getY(pt.actualPct), 4.5, 0, Math.PI * 2); ctx.fill(); }
-            if (pt.forecastPct !== null && state.chartSettings.showForecast) { ctx.fillStyle = "#f59e0b"; ctx.beginPath(); ctx.arc(hx, getY(pt.forecastPct), 4, 0, Math.PI * 2); ctx.fill(); }
+            if (state.chartSettings.showPlanned) { ctx.fillStyle = C.planned; ctx.beginPath(); ctx.arc(hx, getY(pt.plannedPct), 4, 0, Math.PI * 2); ctx.fill(); }
+            if (pt.actualPct !== null && state.chartSettings.showActual) { ctx.fillStyle = C.actual; ctx.beginPath(); ctx.arc(hx, getY(pt.actualPct), 5, 0, Math.PI * 2); ctx.fill(); }
+            if (pt.forecastPct !== null && state.chartSettings.showForecast) { ctx.fillStyle = C.forecast; ctx.beginPath(); ctx.arc(hx, getY(pt.forecastPct), 4, 0, Math.PI * 2); ctx.fill(); }
           }
         }
       }
@@ -1135,12 +1230,12 @@
         tooltip.style.left = `${Math.max(100, Math.min(rect.width - 100, x))}px`;
         tooltip.style.top = `${Math.max(110, y - 10)}px`;
 
-        let html = `<div class="tooltip-date">📅 ${formatThaiDate(date)}</div><div class="tooltip-row"><span>แผนงานสะสม:</span><strong style="color:#60a5fa;">${pPct.toFixed(1)}%</strong></div>`;
+        let html = `<div class="tooltip-date">${formatThaiDate(date)}</div><div class="tooltip-row"><span>แผนงานสะสม:</span><strong>${pPct.toFixed(1)}%</strong></div>`;
         if (aPct !== null) {
-          const vColor = variance >= 0 ? "#34d399" : "#f87171", vText = variance >= 0 ? `+${variance.toFixed(1)}% (เร็วกว่าแผน)` : `${variance.toFixed(1)}% (ล่าช้ากว่าแผน)`;
-          html += `<div class="tooltip-row"><span>ทำจริงสะสม:</span><strong style="color:#34d399;">${aPct.toFixed(1)}%</strong></div><div class="tooltip-row variance"><span>ผลต่าง (SV):</span><span style="color:${vColor};">${vText}</span></div>`;
+          const vColor = variance >= 0 ? "#7fd6aa" : "#f19a97", vText = variance >= 0 ? `+${variance.toFixed(1)}% (เร็วกว่าแผน)` : `${variance.toFixed(1)}% (ล่าช้ากว่าแผน)`;
+          html += `<div class="tooltip-row"><span>ทำจริงสะสม:</span><strong style="color:#f7a400;">${aPct.toFixed(1)}%</strong></div><div class="tooltip-row variance"><span>ผลต่าง (SV):</span><span style="color:${vColor};">${vText}</span></div>`;
         } else {
-          if (fPct !== null) html += `<div class="tooltip-row"><span>คาดการณ์:</span><strong style="color:#fbbf24;">${fPct.toFixed(1)}%</strong></div>`;
+          if (fPct !== null) html += `<div class="tooltip-row"><span>คาดการณ์:</span><strong style="color:#c9ced4;">${fPct.toFixed(1)}%</strong></div>`;
           html += `<div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">* วันที่อยู่หลังวันประเมินผล</div>`;
         }
         tooltip.innerHTML = html; drawSCurveCanvas(tl);
@@ -1154,7 +1249,7 @@
       const ctx = canvas.getContext("2d"), dpr = window.devicePixelRatio || 1;
       canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, rect.width, rect.height);
       const isDark = document.body.getAttribute("data-theme") === "dark", textColor = isDark ? "#94a3b8" : "#64748b";
-      ctx.font = "11px Prompt, sans-serif";
+      ctx.font = "11px 'IBM Plex Sans Thai', sans-serif";
       const logs = [...state.dailyLogs].sort((a, b) => (a.date > b.date ? 1 : -1));
       if (logs.length === 0) { ctx.fillStyle = textColor; ctx.textAlign = "center"; ctx.fillText("ยังไม่มีข้อมูลกำลังคนหน้างาน", rect.width / 2, rect.height / 2); return; }
 
@@ -1174,7 +1269,7 @@
       const labelEvery = Math.max(1, Math.ceil(logs.length / Math.max(1, Math.floor(plotW / 80))));
       logs.forEach((item, idx) => {
         const x = pad.left + (idx / (logs.length - 1 || 1)) * (plotW - barW), barH = ((parseInt(item.workers) || 0) / maxW) * plotH, y = pad.top + plotH - barH;
-        ctx.fillStyle = isDark ? "#818cf8" : "#6366f1"; ctx.fillRect(x, y, barW, barH);
+        ctx.fillStyle = cssVar("--accent") || "#f7a400"; if (ctx.roundRect && barH > 2) { ctx.beginPath(); ctx.roundRect(x, y, barW, barH, [4, 4, 0, 0]); ctx.fill(); } else ctx.fillRect(x, y, barW, barH);
         if (idx % labelEvery === 0 || idx === logs.length - 1) {
           ctx.fillStyle = textColor; ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.fillText(formatThaiDate(item.date, true), x + barW / 2, pad.top + plotH + 8);
         }
@@ -1192,16 +1287,27 @@
       document.getElementById("lbl-project-date-range").innerText = `${formatThaiDate(tl.pStart)} ถึง ${formatThaiDate(tl.pEnd)}`;
       document.getElementById("status-date-input").value = state.project.statusDate || "";
       document.getElementById("kpi-days-elapsed").innerHTML = `${tl.elapsedDays} <span class="unit">/ ${tl.totalDays} วัน</span>`;
-      document.getElementById("kpi-time-pct").innerText = `${Math.max(0, Math.min(100, (tl.elapsedDays / tl.totalDays) * 100)).toFixed(1)}%`;
+      const timePct = Math.max(0, Math.min(100, (tl.elapsedDays / tl.totalDays) * 100));
+      document.getElementById("kpi-time-pct").innerText = `${timePct.toFixed(1)}%`;
+      const setBar = (id, pct) => { const el = document.getElementById(id); if (el) el.style.width = `${Math.max(0, Math.min(100, pct || 0))}%`; };
+      setBar("kpi-bar-time", timePct); setBar("kpi-bar-plan", tl.plannedAtStatus); setBar("kpi-bar-actual", tl.actualAtStatus);
+      document.getElementById("hero-actual").innerHTML = `${tl.actualAtStatus.toFixed(1)}<small>%</small>`;
+      document.getElementById("hero-sub").textContent = `แผนงาน ${tl.plannedAtStatus.toFixed(1)}% · ${tl.variancePct > 0.5 ? "เร็วกว่าแผน" : tl.variancePct < -0.5 ? "ล่าช้ากว่าแผน" : "ตามแผน"} ${tl.variancePct > 0 ? "+" : ""}${tl.variancePct.toFixed(1)}%`;
+      document.getElementById("hero-bar-actual").style.width = `${tl.actualAtStatus}%`;
+      document.getElementById("hero-bar-plan").style.left = `calc(${tl.plannedAtStatus}% - 1px)`;
       document.getElementById("kpi-planned-pct").innerHTML = `${tl.plannedAtStatus.toFixed(1)} <span class="unit">%</span>`;
       document.getElementById("kpi-actual-pct").innerHTML = `${tl.actualAtStatus.toFixed(1)} <span class="unit">%</span>`;
       const valueTotals = getProjectValueTotals();
       document.getElementById("kpi-actual-value").innerHTML = `${bahtFormatter.format(valueTotals.earned)} <span class="unit">บาท</span>`;
       document.getElementById("kpi-actual-value-total").textContent = valueTotals.budget > 0 ? `จากมูลค่างานทั้งหมด ${formatBaht(valueTotals.budget)}` : "กรอกมูลค่างานเพื่อแสดงยอดสะสม";
+      setBar("kpi-bar-value", valueTotals.budget > 0 ? valueTotals.earned / valueTotals.budget * 100 : 0);
 
       const vVal = tl.variancePct, vBadge = document.getElementById("kpi-variance-badge"), vDays = document.getElementById("kpi-days-variance");
       const absDays = Math.abs(tl.daysVariance);
       document.getElementById("kpi-variance-val").innerHTML = `${vVal > 0 ? "+" : ""}${vVal.toFixed(1)} <span class="unit">%</span>`;
+      const svColor = vVal > 0.5 ? "#2e9e6b" : vVal < -0.5 ? "#d9534f" : "#f7a400";
+      document.getElementById("kpi-card-sv").style.setProperty("--kc", svColor);
+      document.getElementById("kpi-variance-val").style.color = svColor;
       if (vVal > 0.5) { vBadge.className = "badge badge-success"; vBadge.innerText = "เร็วกว่าแผนงาน"; vDays.innerText = `เร็วกว่า ${absDays} วัน`; vDays.style.color = "var(--success)"; }
       else if (vVal < -0.5) { vBadge.className = "badge badge-danger"; vBadge.innerText = "ล่าช้ากว่าแผน"; vDays.innerText = `ล่าช้า ${absDays} วัน`; vDays.style.color = "var(--danger)"; }
       else { vBadge.className = "badge badge-warning"; vBadge.innerText = "ตรงตามแผนงาน"; vDays.innerText = "ตามแผน"; vDays.style.color = "var(--text-muted)"; }
@@ -1267,7 +1373,7 @@
       }
       tl.dates.forEach((d, idx) => {
         const isStat = idx === tl.statusIdx, isWeekend = d.getDay() === 0 || d.getDay() === 6;
-        headD += `<div style="font-size:0.72rem; ${isStat ? "background:#fee2e2;color:#ef4444;font-weight:700;" : isWeekend ? "background:rgba(148,163,184,0.12);" : ""}"><div>${d.getDate()}</div><div style="font-size:0.65rem; color:var(--text-muted);">${DAYS_TH[d.getDay()]}</div></div>`;
+        headD += `<div style="font-size:0.72rem; ${isStat ? "background:var(--cutoff-color);color:#fff;font-weight:600;border-radius:4px;" : isWeekend ? "background:rgba(148,163,184,0.10);" : ""}"><div>${d.getDate()}</div><div style="font-size:0.65rem; color:var(--text-muted);">${DAYS_TH[d.getDay()]}</div></div>`;
       });
       const dayTrackStyle = `grid-template-columns:repeat(${tl.dates.length},${DAY_PX}px);width:${tl.dates.length * DAY_PX}px;`;
       thead.innerHTML = `<tr class="gantt-header-row"><th class="gantt-task-col">รายการงาน (Task Name)</th><th style="padding:0; background:var(--bg-subtle);"><div style="padding:6px 8px; text-align:left; border-bottom:1px solid var(--border-color);"><span style="position:sticky; left:330px; display:inline-block;">ไทม์ไลน์รายวัน (${formatThaiDate(tl.pStart)} - ${formatThaiDate(tl.chartEnd)})</span></div><div class="gantt-header-track months" style="${dayTrackStyle}">${headMonths}</div><div class="gantt-header-track" style="${dayTrackStyle}">${headD}</div></th></tr>`;
@@ -1281,7 +1387,7 @@
       let html = "";
       groups.forEach((tasks, cat) => {
         const categoryValue = state.tasks.filter(item => item.category === cat).reduce((sum, item) => sum + getTaskValue(item), 0);
-        html += `<tr class="category-row"><td class="gantt-task-col"><div style="display:flex; align-items:center; justify-content:space-between; gap:8px;"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📁 ${escapeHtml(cat)} <span style="font-weight:400; color:var(--text-muted);">(${tasks.length})</span></span>${categoryValue > 0 ? `<span class="badge badge-info" style="white-space:nowrap; flex-shrink:0;">${formatBaht(categoryValue)}</span>` : ""}</div></td><td class="gantt-status-cell" style="background:var(--bg-subtle);">${statusLine}</td></tr>`;
+        html += `<tr class="category-row"><td class="gantt-task-col"><div style="display:flex; align-items:center; justify-content:space-between; gap:8px;"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-flex; align-items:center; gap:8px;"><svg class="ic" viewBox="0 0 24 24" style="width:15px;height:15px;color:var(--accent)"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> ${escapeHtml(cat)} <span style="font-weight:400; color:var(--text-muted);">(${tasks.length})</span></span>${categoryValue > 0 ? `<span class="badge badge-info" style="white-space:nowrap; flex-shrink:0;">${formatBaht(categoryValue)}</span>` : ""}</div></td><td class="gantt-status-cell" style="background:var(--bg-subtle);">${statusLine}</td></tr>`;
         tasks.forEach(task => {
           const ps = parseDate(task.plannedStart) || tl.pStart, pe = parseDate(task.plannedEnd) || ps;
           const bLeft = Math.max(0, diffDays(tl.pStart, ps)) * DAY_PX, bWidth = Math.max(1, diffDays(ps, pe) + 1) * DAY_PX;
@@ -1305,12 +1411,45 @@
         });
       });
       tbody.innerHTML = html;
+      syncGanttHScroll();
+    }
+    // Size the custom horizontal bar so it covers exactly the visible timeline area and mirrors its range.
+    function syncGanttHScroll() {
+      const cont = document.getElementById("gantt-scroll-container"), bar = document.getElementById("gantt-hscroll"), inner = document.getElementById("gantt-hscroll-inner");
+      if (!cont || !bar || !inner || !cont.offsetParent) return;
+      const frozen = (cont.querySelector(".gantt-task-col") || {}).offsetWidth || 320;
+      const vScrollbar = cont.offsetWidth - cont.clientWidth;
+      bar.style.marginLeft = `${frozen}px`;
+      bar.style.marginRight = `${vScrollbar}px`;
+      inner.style.width = `${Math.max(0, cont.scrollWidth - frozen)}px`;
+      bar.classList.toggle("hidden", cont.scrollWidth <= cont.clientWidth + 1);
+      bar.scrollLeft = cont.scrollLeft;
+    }
+    function setupGanttHScroll() {
+      const cont = document.getElementById("gantt-scroll-container"), bar = document.getElementById("gantt-hscroll");
+      // Mirror scroll position between the table and the custom bar.
+      // The scroll event caused by our own assignment arrives a frame later; it is recognised by its
+      // value and ignored. (A time-based lock let that echo write back to the table, which cancelled
+      // smooth scrolling — the "ไปที่วันประเมิน" button moved only a few pixels.)
+      const mirror = (from, to) => () => {
+        if (from._syncedTo !== undefined && Math.abs(from.scrollLeft - from._syncedTo) < 1.5) { from._syncedTo = undefined; return; }
+        from._syncedTo = undefined;
+        if (Math.abs(to.scrollLeft - from.scrollLeft) < 1.5) return;
+        to._syncedTo = from.scrollLeft;
+        to.scrollLeft = from.scrollLeft;
+      };
+      cont.addEventListener("scroll", mirror(cont, bar), { passive: true });
+      bar.addEventListener("scroll", mirror(bar, cont), { passive: true });
     }
     function scrollGanttToToday(smooth) {
       const cont = document.getElementById("gantt-scroll-container"), tl = getTimeline();
       if (!cont) return;
+      if (tl.statusIdx < 0 || tl.statusIdx >= tl.dates.length) { if (smooth !== false) showToast("วันประเมินผลอยู่ก่อนวันเริ่มโครงการ จึงไม่มีในไทม์ไลน์"); return; }
       const frozen = (cont.querySelector(".gantt-task-col") || {}).offsetWidth || 320;
       cont.scrollTo({ left: Math.max(0, tl.statusIdx * DAY_PX + 14 - (cont.clientWidth - frozen) / 2), behavior: smooth === false ? "auto" : "smooth" });
+      // Flash the status-date header cell so the click always gives visible feedback.
+      const dayCell = cont.querySelector("thead .gantt-header-track:last-child")?.children[tl.statusIdx];
+      if (smooth !== false && dayCell && dayCell.animate) dayCell.animate([{ boxShadow: "0 0 0 3px var(--accent)" }, { boxShadow: "0 0 0 3px transparent" }], { duration: 700, iterations: 3 });
     }
 
     function toggleGanttExpanded(force) {
@@ -1320,7 +1459,8 @@
       wrapper.classList.toggle("gantt-expanded", expanded);
       document.body.classList.toggle("gantt-expanded-open", expanded);
       button.setAttribute("aria-pressed", String(expanded));
-      button.innerHTML = expanded ? "⛶ ย่อกลับ" : "⛶ ขยาย";
+      requestAnimationFrame(syncGanttHScroll);
+      button.innerHTML = expanded ? `<svg class="ic" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>ย่อกลับ` : `<svg class="ic" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>ขยาย`;
     }
 
     /* =========================================================
@@ -1358,7 +1498,7 @@
       });
 
       if (state.tasks.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:45px 20px;"><div style="font-size:2.2rem; margin-bottom:10px;">📋</div><div style="font-weight:600; font-size:1.1rem; margin-bottom:6px;">ยังไม่มีรายการงานในโครงการ</div><button class="btn btn-primary btn-sm" onclick="openTaskModal(null)">เพิ่มงานแรก</button></td></tr>`; updateBatchDelBtn(); return;
+        tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:45px 20px;"><div style="width:44px;height:44px;margin:0 auto 12px;color:var(--text-subtle);"><svg class="ic" style="width:44px;height:44px;stroke-width:1.2" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg></div><div style="font-weight:600; font-size:1.1rem; margin-bottom:6px;">ยังไม่มีรายการงานในโครงการ</div><button class="btn btn-primary btn-sm" onclick="openTaskModal(null)">เพิ่มงานแรก</button></td></tr>`; updateBatchDelBtn(); return;
       }
       if (list.length === 0) { tbody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่พบรายการงานตามตัวกรอง</td></tr>`; updateBatchDelBtn(); return; }
 
@@ -1377,7 +1517,7 @@
             <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(t.category)}"><span class="badge badge-neutral" style="font-size:0.75rem;">${escapeHtml(t.category)}</span></td>
             <td style="overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(t.name)}">
               <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><strong style="cursor:pointer;" onclick="openTaskModal(${id})">${escapeHtml(t.name)}</strong></div>
-              ${t.notes ? `<div style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(t.notes)}">📝 ${escapeHtml(t.notes)}</div>` : ""}
+              ${t.notes ? `<div style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(t.notes)}">${escapeHtml(t.notes)}</div>` : ""}
             </td>
             <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text-muted);" title="${escapeHtml(t.assignedTo || "-")}">${escapeHtml(t.assignedTo || "-")}</td>
             <td style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.8rem;" title="${planText}">${planText}</td>
@@ -1394,8 +1534,8 @@
             <td id="stat-cell-${escapeHtml(t.id)}" style="text-align:center;">${getTaskStatusBadgeHtml(prog, t.plannedEnd)}</td>
             <td style="text-align:center;">
               <div style="display:flex; justify-content:center; gap:4px;">
-                <button class="btn-icon btn-sm" onclick="openTaskModal(${id})" title="แก้ไข">✏️</button>
-                <button class="btn-icon btn-sm" onclick="deleteTask(${id})" title="ลบ" style="color:var(--danger);">🗑️</button>
+                <button class="btn-icon btn-sm" onclick="openTaskModal(${id})" title="แก้ไข"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/></svg></button>
+                <button class="btn-icon btn-sm danger" onclick="deleteTask(${id})" title="ลบ"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
               </div>
             </td>
           </tr>`;
@@ -1580,11 +1720,11 @@
       const tbody = document.getElementById("manpower-tbody"); if (!tbody) return;
       const logs = [...state.dailyLogs].sort((a, b) => (a.date < b.date ? 1 : -1));
       if (logs.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่มีรายการบันทึก</td></tr>`; updateLogSelection(); return; }
-      tbody.innerHTML = logs.map(l => `<tr class="log-row"><td style="text-align:center;"><input type="checkbox" class="log-checkbox" value="${escapeHtml(l.id)}" onchange="updateLogSelection()"></td><td><strong>${formatThaiDate(l.date)}</strong></td><td style="text-align:center;"><span class="badge badge-info">${l.workers} คน</span></td><td style="white-space:pre-wrap;">${escapeHtml(l.activity || "-")}</td><td style="color:var(--text-muted);">${escapeHtml(l.notes || "-")}</td><td style="text-align:center;"><div style="display:flex; justify-content:center; gap:4px;"><button class="btn-icon btn-sm" onclick="openAddDailyLogModal(${jsArg(l.id)})" title="แก้ไข">✏️</button><button class="btn-icon btn-sm" onclick="deleteDailyLog(${jsArg(l.id)})" title="ลบ" style="color:var(--danger);">🗑️</button></div></td></tr>`).join(""); updateLogSelection();
+      tbody.innerHTML = logs.map(l => `<tr class="log-row"><td style="text-align:center;"><input type="checkbox" class="log-checkbox" value="${escapeHtml(l.id)}" onchange="updateLogSelection()"></td><td><strong>${formatThaiDate(l.date)}</strong></td><td style="text-align:center;"><span class="badge badge-info">${l.workers} คน</span></td><td style="white-space:pre-wrap;">${escapeHtml(l.activity || "-")}</td><td style="color:var(--text-muted);">${escapeHtml(l.notes || "-")}</td><td style="text-align:center;"><div style="display:flex; justify-content:center; gap:4px;"><button class="btn-icon btn-sm" onclick="openAddDailyLogModal(${jsArg(l.id)})" title="แก้ไข"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/></svg></button><button class="btn-icon btn-sm danger" onclick="deleteDailyLog(${jsArg(l.id)})" title="ลบ"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button></div></td></tr>`).join(""); updateLogSelection();
     }
     function openAddDailyLogModal(id) {
       const log = id ? state.dailyLogs.find(l => l.id === id) : null;
-      document.getElementById("daily-log-modal-title").textContent = log ? "✏️ แก้ไขบันทึกหน้างาน" : "บันทึกคนงาน & รายงานหน้างาน";
+      document.getElementById("daily-log-modal-title").textContent = log ? "แก้ไขบันทึกหน้างาน" : "บันทึกคนงาน & รายงานหน้างาน";
       document.getElementById("modal-log-id").value = log ? log.id : "";
       document.getElementById("modal-log-date").value = log ? log.date : (state.project.statusDate || formatDate(today()));
       document.getElementById("modal-log-workers").value = log ? log.workers : "";
@@ -1655,7 +1795,7 @@
       setWeightFieldMode();
       const set = (elId, v) => { document.getElementById(elId).value = v; };
       if (task) {
-        title.textContent = `✏️ แก้ไขรายการงาน: ${task.name}`;
+        title.textContent = `แก้ไขรายการงาน: ${task.name}`;
         set("modal-task-id", task.id); set("modal-task-name", task.name); set("modal-task-assigned", task.assignedTo || "");
         set("modal-task-pstart", task.plannedStart); set("modal-task-pend", task.plannedEnd); set("modal-task-duration", task.duration);
         set("modal-task-weight", hasValue(task.weight) ? task.weight : ""); set("modal-task-value", task.value ?? "");
@@ -1664,7 +1804,7 @@
         btnDel.style.display = "inline-flex";
       } else {
         const start = parseDate(state.project.statusDate) || today();
-        title.textContent = "➕ เพิ่มรายการงานใหม่";
+        title.textContent = "เพิ่มรายการงานใหม่";
         set("modal-task-id", ""); set("modal-task-name", ""); set("modal-task-assigned", "");
         set("modal-task-pstart", formatDate(start)); set("modal-task-pend", formatDate(addDays(start, 6)));
         set("modal-task-weight", ""); set("modal-task-value", ""); set("modal-task-astart", ""); set("modal-task-aend", "");
@@ -1766,6 +1906,8 @@
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", (b.getAttribute("onclick") || "").includes(`'${id}'`)));
       document.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.id === id));
       state.activeTab = id;
+      document.body.dataset.tab = id;
+      window.scrollTo({ top: 0, behavior: "auto" });
       requestAnimationFrame(() => {
         if (id === "tab-scurve") renderCharts();
         else if (id === "tab-gantt") { renderGantt(); if (!ganttScrolledOnce) { ganttScrolledOnce = true; scrollGanttToToday(false); } }
@@ -1922,6 +2064,7 @@
        ========================================================= */
     function setupGlobalListeners() {
       setupCanvasHover();
+      setupGanttHScroll();
       const modalIds = ["task-modal", "category-manager-modal", "project-modal", "daily-log-modal"];
       // Close a modal by clicking its dark backdrop (only if the press also started there).
       modalIds.forEach(mid => {
