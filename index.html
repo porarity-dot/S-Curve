@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Project Planner & S-Curve Dashboard</title>
   <!-- Google Fonts: IBM Plex Sans Thai & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -345,7 +345,7 @@
       .task-table .c-prog { grid-area: prog; }
       .task-table .c-stat { grid-area: stat; }
       .task-table .c-actions { grid-area: actions; align-self: start; }
-      .task-table tbody > tr:not(.task-row-item) > td { display: block; }
+      .task-table tbody > tr:not(.task-row-item):not(.log-row) > td { display: block; }
       .table-tip { display: none; }
       .progress-slider { height: 6px; }
       .progress-slider::-webkit-slider-thumb { width: 22px; height: 22px; }
@@ -480,6 +480,95 @@
       .status-date-badge label { display: none; }
       .perf-box { border-left: none; padding: 10px 0; }
     }
+    /* ---------- Phones: compact header, bottom tab bar, touch-sized controls ---------- */
+    .tab-ic, .tab-short { display: none; }
+    @media (max-width: 768px) {
+      :root { --mnav-h: 60px; }
+      body { font-size: 14.5px; padding-bottom: calc(var(--mnav-h) + env(safe-area-inset-bottom)); }
+      /* backdrop-filter would trap the fixed tab bar inside the header, so use a solid header here */
+      header.site-header { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--bg-card); }
+      .header-content { flex-wrap: wrap; height: auto; padding: 8px 0 10px; gap: 8px; }
+      .brand { margin-right: auto; gap: 8px; min-width: 0; }
+      .brand-mark, .brand-mark svg { width: 30px; height: 30px; }
+      .brand-name small { display: none; }
+      .header-right { display: contents; }
+      .header-right > .btn, .header-right > .btn-icon { order: 2; width: 40px; height: 40px; padding: 0; border-radius: 50%; }
+      .header-right .btn-txt { display: none; }
+      .header-right .status-date-badge { order: 3; width: 100%; margin: 0; padding: 4px 4px 4px 14px; }
+      .status-date-badge label { display: inline; }
+      .status-date-badge input[type="date"] { flex: 1; min-width: 0; font-size: 16px; }
+      .status-date-badge .btn { padding: 8px 16px; }
+
+      .tab-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; order: 0; width: auto; height: auto; gap: 0; padding: 0 4px env(safe-area-inset-bottom); background: var(--bg-card); border-top: 1px solid var(--border-color); box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.06); overflow: visible; }
+      .tab-btn { flex: 1 1 0; min-width: 0; flex-direction: column; justify-content: center; gap: 3px; height: var(--mnav-h); padding: 6px 2px; font-size: 0.72rem; -webkit-tap-highlight-color: transparent; }
+      .tab-btn::after { top: -1px; bottom: auto; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; }
+      .tab-btn.active { color: var(--accent-strong); }
+      .tab-ic { display: block; width: 22px; height: 22px; }
+      .tab-full { display: none; }
+      .tab-short { display: inline; }
+      .tab-count { position: absolute; top: 5px; left: calc(50% + 7px); min-width: 18px; height: 16px; padding: 0 5px; font-size: 0.64rem; }
+
+      .hero-inner { gap: 16px; padding-top: 20px; padding-bottom: 22px; }
+      .hero h1 { font-size: 1.75rem; }
+      .hero-meta { gap: 4px 16px; margin-top: 10px; font-size: 0.84rem; }
+      .hero-progress .big { font-size: 3rem; }
+
+      .kpi-card { padding: 16px 10px 14px; gap: 3px; border-bottom: 1px solid var(--border-color); }
+      .kpi-card:nth-child(odd) { border-right: 1px solid var(--border-color); }
+      .kpi-card::after { left: 38%; right: 38%; }
+      .kpi-icon { width: 42px; height: 42px; padding: 9px; margin-bottom: 4px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--kc) 6%, transparent); }
+      .kpi-value { font-size: 1.4rem; }
+      .kpi-title { font-size: 0.8rem; }
+      .kpi-footer { font-size: 0.72rem; }
+      .kpi-meter { margin: 3px 0 1px; }
+
+      main.page { padding-top: 16px; padding-bottom: 24px; }
+      .chart-panel, .variance-table-card { padding: 18px 16px; }
+      .chart-panel, .variance-table-card, .gantt-wrapper, .task-table-wrapper { margin-bottom: 16px; }
+      .chart-panel-header { gap: 10px; margin-bottom: 14px; }
+      .chart-title-area h2, .section-title { font-size: 1.15rem; gap: 10px; }
+      .chart-title-area p { padding-left: 14px; }
+      .chart-legend { font-size: 0.78rem; }
+      .legend-item { padding: 6px 9px; }
+      .canvas-container { height: 300px; }
+      #scurve-canvas { touch-action: pan-y; }   /* vertical swipe scrolls the page, sideways drag reads the chart */
+      #chart-tooltip { min-width: 170px; font-size: 0.76rem; }
+
+      .gantt-toolbar, .task-table-toolbar { padding: 14px 16px; gap: 10px; }
+      .gantt-toolbar .filter-select { flex: 1 1 140px; }
+      .gantt-wrapper.gantt-expanded { inset: 0; border-radius: 0; }
+      .task-table-responsive { max-height: none; }   /* no scroll-inside-scroll on phones */
+
+      /* 16px text stops iOS from zooming the page when a field gets focus */
+      .search-input, .filter-select, .form-control, .upd-num input { font-size: 16px; }
+      .search-input, .filter-select { padding-top: 10px; padding-bottom: 10px; }
+      .btn-sm { padding: 8px 14px; }
+      .btn-icon.btn-sm { width: 36px; height: 36px; }
+      .task-table input[type="checkbox"], .gantt-table input[type="checkbox"], .upd-bar input[type="checkbox"] { width: 20px; height: 20px; }
+
+      /* modals open as bottom sheets */
+      .modal-overlay { padding: 0; align-items: flex-end; }
+      .modal-card { max-width: 100%; max-height: 92vh; max-height: 92dvh; border-radius: 16px 16px 0 0; }
+      .modal-header { padding: 16px 16px 12px; }
+      .modal-body { padding: 16px; }
+      .modal-footer { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); flex-wrap: wrap; }
+      .modal-section { padding: 14px; }
+      .hist-item { grid-template-columns: 84px 48px minmax(0, 1fr) auto; gap: 6px; }
+
+      .toast { left: 16px; right: 16px; bottom: calc(var(--mnav-h) + 14px + env(safe-area-inset-bottom)); justify-content: center; border-radius: 14px; }
+      footer.site-footer { padding: 16px 0; }
+    }
+    /* daily site logs become cards on narrow screens (same container as the task table) */
+    @container tasks (max-width: 640px) {
+      .task-table tr.log-row { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; grid-template-areas: "sel date actions" ". w w" ". act act" ". notes notes"; align-items: center; gap: 4px 8px; padding: 12px 14px 12px 8px; border-bottom: 1px solid var(--border-color); }
+      .task-table tr.log-row > td { border: 0; padding: 0; text-align: left !important; }
+      .task-table .l-sel { grid-area: sel; }
+      .task-table .l-date { grid-area: date; }
+      .task-table .l-w { grid-area: w; }
+      .task-table .l-act { grid-area: act; }
+      .task-table .l-notes { grid-area: notes; font-size: 0.8rem; }
+      .task-table .l-actions { grid-area: actions; }
+    }
   </style>
 </head>
 <body data-theme="light" data-tab="tab-scurve">
@@ -499,10 +588,10 @@
         </a>
 
         <nav class="tab-bar">
-          <button class="tab-btn active" onclick="switchTab('tab-scurve')">ภาพรวม S-Curve</button>
-          <button class="tab-btn" onclick="switchTab('tab-gantt')">แผนภูมิแกนต์</button>
-          <button class="tab-btn" onclick="switchTab('tab-tasks')">รายการงาน <span class="tab-count" id="tab-task-count">0</span></button>
-          <button class="tab-btn" onclick="switchTab('tab-manpower')">บันทึกหน้างาน</button>
+          <button class="tab-btn active" onclick="switchTab('tab-scurve')"><svg class="ic tab-ic" viewBox="0 0 24 24"><path d="M3 20h18"/><path d="M4 17c5 0 6-11 16-12"/></svg><span class="tab-full">ภาพรวม S-Curve</span><span class="tab-short">ภาพรวม</span></button>
+          <button class="tab-btn" onclick="switchTab('tab-gantt')"><svg class="ic tab-ic" viewBox="0 0 24 24"><path d="M4 6h9M8 12h10M6 18h8"/></svg><span class="tab-full">แผนภูมิแกนต์</span><span class="tab-short">แกนต์</span></button>
+          <button class="tab-btn" onclick="switchTab('tab-tasks')"><svg class="ic tab-ic" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/></svg><span class="tab-full">รายการงาน</span><span class="tab-short">งาน</span> <span class="tab-count" id="tab-task-count">0</span></button>
+          <button class="tab-btn" onclick="switchTab('tab-manpower')"><svg class="ic tab-ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.8-3.6 3.2-5.5 6-5.5s5.2 1.9 6 5.5"/><path d="M16 4.6a3.2 3.2 0 0 1 0 6.2M18 14.8c1.5.8 2.6 2.5 3 5.2"/></svg><span class="tab-full">บันทึกหน้างาน</span><span class="tab-short">หน้างาน</span></button>
         </nav>
 
         <div class="header-right">
@@ -1462,7 +1551,7 @@
       const canvas = document.getElementById("scurve-canvas"), tooltip = document.getElementById("chart-tooltip");
       if (!canvas || !tooltip) return;
       const hide = () => { chartHoverInfo = { active: false }; tooltip.style.display = "none"; drawSCurveCanvas(getTimeline()); };
-      canvas.addEventListener("mousemove", e => {
+      const onMove = e => {
         if (state.tasks.length === 0) return;
         const rect = canvas.getBoundingClientRect(); if (!rect || rect.width <= 0) return;
         const tl = getTimeline(), pad = SC_PAD, plotW = rect.width - pad.left - pad.right;
@@ -1492,8 +1581,12 @@
           html += `<div style="font-size:0.75rem; color:#94a3b8; margin-top:4px;">* วันที่อยู่หลังวันประเมินผล</div>`;
         }
         tooltip.innerHTML = html; drawSCurveCanvas(tl);
-      });
-      canvas.addEventListener("mouseleave", hide);
+      };
+      // pointer events cover mouse and touch: on a phone, tap or drag sideways on the chart to read values
+      canvas.addEventListener("pointermove", onMove);
+      canvas.addEventListener("pointerdown", onMove);
+      canvas.addEventListener("pointerleave", e => { if (e.pointerType === "mouse") hide(); });
+      document.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse" && e.target !== canvas && chartHoverInfo && chartHoverInfo.active) hide(); });
     }
 
     function drawManpowerCanvas() {
@@ -1724,7 +1817,9 @@
       const top = cont.getBoundingClientRect().top + window.scrollY;           // distance from top of the page
       const bar = document.getElementById("gantt-hscroll");
       const below = (bar && !bar.classList.contains("hidden") ? bar.offsetHeight : 0) + 2 + 20;  // h-scrollbar + card border + gap
-      cont.style.maxHeight = `${Math.max(260, Math.floor(window.innerHeight - top - below))}px`;
+      const phone = window.innerWidth <= 768, nav = phone ? ((document.querySelector(".tab-bar") || {}).offsetHeight || 0) : 0;
+      const minH = phone ? Math.round(window.innerHeight * 0.62) : 260;   // phones: keep plenty of rows visible
+      cont.style.maxHeight = `${Math.max(minH, Math.floor(window.innerHeight - top - below - nav))}px`;
     }
     function ganttTaskColWidth(contW) {
       if (!contW) return 320;
@@ -2061,7 +2156,7 @@
       const tbody = document.getElementById("manpower-tbody"); if (!tbody) return;
       const logs = [...state.dailyLogs].sort((a, b) => (a.date < b.date ? 1 : -1));
       if (logs.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">ไม่มีรายการบันทึก</td></tr>`; updateLogSelection(); return; }
-      tbody.innerHTML = logs.map(l => `<tr class="log-row"><td style="text-align:center;"><input type="checkbox" class="log-checkbox" value="${escapeHtml(l.id)}" onchange="updateLogSelection()"></td><td><strong>${formatThaiDate(l.date)}</strong></td><td style="text-align:center;"><span class="badge badge-info">${l.workers} คน</span></td><td style="white-space:pre-wrap;">${escapeHtml(l.activity || "-")}</td><td style="color:var(--text-muted);">${escapeHtml(l.notes || "-")}</td><td style="text-align:center;"><div style="display:flex; justify-content:center; gap:4px;"><button class="btn-icon btn-sm" onclick="openAddDailyLogModal(${jsArg(l.id)})" title="แก้ไข"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/></svg></button><button class="btn-icon btn-sm danger" onclick="deleteDailyLog(${jsArg(l.id)})" title="ลบ"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button></div></td></tr>`).join(""); updateLogSelection();
+      tbody.innerHTML = logs.map(l => `<tr class="log-row"><td class="l-sel" style="text-align:center;"><input type="checkbox" class="log-checkbox" value="${escapeHtml(l.id)}" onchange="updateLogSelection()"></td><td class="l-date"><strong>${formatThaiDate(l.date)}</strong></td><td class="l-w" style="text-align:center;"><span class="badge badge-info">${l.workers} คน</span></td><td class="l-act" style="white-space:pre-wrap;">${escapeHtml(l.activity || "-")}</td><td class="l-notes" style="color:var(--text-muted);">${escapeHtml(l.notes || "-")}</td><td class="l-actions" style="text-align:center;"><div style="display:flex; justify-content:center; gap:4px;"><button class="btn-icon btn-sm" onclick="openAddDailyLogModal(${jsArg(l.id)})" title="แก้ไข"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/></svg></button><button class="btn-icon btn-sm danger" onclick="deleteDailyLog(${jsArg(l.id)})" title="ลบ"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button></div></td></tr>`).join(""); updateLogSelection();
     }
     function openAddDailyLogModal(id) {
       const log = id ? state.dailyLogs.find(l => l.id === id) : null;
